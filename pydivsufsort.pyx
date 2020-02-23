@@ -3,7 +3,7 @@ import numpy as np
 cimport numpy as np
 
 
-def divsufsort(object[np.uint8_t, ndim=1] inp not None):
+def divsufsort(const np.uint8_t[:] inp not None):
     if isinstance(inp, np.ndarray) and not inp.flags['C_CONTIGUOUS']:
         # Make a contiguous copy of the numpy array.
         inp = np.ascontiguousarray(inp)
