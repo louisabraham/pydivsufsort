@@ -4,8 +4,7 @@ from pydivsufsort import divsufsort
 from time import time
 
 
-s = np.array(list(b"banana"), dtype=np.uint8)
-print(divsufsort(s))
+print(divsufsort(b"banana"))
 
 
 n = 10 ** 6
