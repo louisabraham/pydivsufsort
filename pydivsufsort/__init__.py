@@ -1,0 +1,1 @@
+from .divsufsort import divsufsort
