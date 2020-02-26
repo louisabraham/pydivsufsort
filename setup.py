@@ -1,11 +1,32 @@
 #!/usr/bin/env python3
 
-import os
+from pathlib import Path
+from subprocess import Popen
 from setuptools import setup
+from distutils.command.build import build as _build
+
+# make the wheel platform specific
+# https://stackoverflow.com/a/45150383
+try:
+    from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+    class bdist_wheel(_bdist_wheel):
+        def finalize_options(self):
+            _bdist_wheel.finalize_options(self)
+            self.root_is_pure = False
+except ImportError:
+    bdist_wheel = None
 
 
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+class build(_build):
+    def run(self):
+        super().run()
+        script = Path(__file__).parent / "build.sh"
+        Popen([script.absolute().as_posix()], shell=True, executable="/bin/bash")
+        
+
+
+def read(fname):    
+    return (Path(__file__).parent / fname).open().read()
 
 
 setup(
@@ -22,5 +43,6 @@ setup(
     package_data={'pydivsufsort': ['libdivsufsort.so*', 'libdivsufsort64.so*']},
     python_requires=">=3.5",
     classifiers=[],
+    cmdclass={'build': build, 'bdist_wheel': bdist_wheel},
 )
 
