@@ -3,6 +3,7 @@
 rm -rf libdivsufsort
 mkdir libdivsufsort
 curl -L https://github.com/y-256/libdivsufsort/tarball/master | tar xz --strip-components=1 -C libdivsufsort
+rm -rf tempbuild
 mkdir tempbuild
 cd tempbuild
 cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF ../libdivsufsort

@@ -4,6 +4,7 @@ from pathlib import Path
 from subprocess import Popen
 from setuptools import setup
 from distutils.command.build import build as _build
+from distutils.command.install import install as _install
 
 # make the wheel platform specific
 # https://stackoverflow.com/a/45150383
@@ -19,10 +20,15 @@ except ImportError:
 
 class build(_build):
     def run(self):
-        super().run()
         script = Path(__file__).parent / "build.sh"
-        Popen([script.absolute().as_posix()], shell=True, executable="/bin/bash")
-        
+        Popen([script.absolute().as_posix()], shell=True, executable="/bin/bash").wait()
+        super().run()
+
+
+# idk why this is required for build to execute
+class install(_install):
+    def run(self):
+        super().run()
 
 
 def read(fname):    
@@ -43,6 +49,6 @@ setup(
     package_data={'pydivsufsort': ['libdivsufsort.so*', 'libdivsufsort64.so*']},
     python_requires=">=3.5",
     classifiers=[],
-    cmdclass={'build': build, 'bdist_wheel': bdist_wheel},
+    cmdclass={'build': build, 'bdist_wheel': bdist_wheel, 'install': install},
 )
 
