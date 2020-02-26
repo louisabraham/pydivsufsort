@@ -47,7 +47,7 @@ setup(
     url="https://github.com/louisabraham/pydivsufsort",
     packages=["pydivsufsort"],
     package_data={'pydivsufsort': ['libdivsufsort.*', 'libdivsufsort64.*']},
-    python_requires=">=3.5",
+    python_requires=">=3.6",
     classifiers=[],
     cmdclass={'build': build, 'bdist_wheel': bdist_wheel, 'install': install},
 )
