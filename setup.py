@@ -46,7 +46,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/louisabraham/pydivsufsort",
     packages=["pydivsufsort"],
-    package_data={'pydivsufsort': ['libdivsufsort.so*', 'libdivsufsort64.so*']},
+    package_data={'pydivsufsort': ['libdivsufsort.*', 'libdivsufsort64.*']},
     python_requires=">=3.5",
     classifiers=[],
     cmdclass={'build': build, 'bdist_wheel': bdist_wheel, 'install': install},
