@@ -1,3 +1,3 @@
-1. Install <https://github.com/y-256/libdivsufsort/> with the option `-DBUILD_DIVSUFSORT64=ON`
-2. `python setup.py build_ext -i`
-3. `LD_LIBRARY_PATH=/usr/local/lib python example.py`
+1. `./build.sh`
+2. `pip install .`
+3. `cd examples && python example.py`
