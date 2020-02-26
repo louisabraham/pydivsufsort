@@ -15,8 +15,8 @@ def divsufsort(inp):
         inp_p = ctypes.pointer(np.ctypeslib.as_ctypes(inp))
     elif isinstance(inp, array):
         assert inp.typecode == 'B'
-        addr, _ = inp.buffer_info()
-        inp_p = addr
+        inp = (ctypes.c_uint8 * len(inp)).from_buffer(inp)
+        inp_p = ctypes.byref(inp)
     else:
         inp_p = inp
    
