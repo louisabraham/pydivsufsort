@@ -1,3 +1,3 @@
-1. `pip install .`
+1. `python -m pip install .`
 2. `pytest`
 
