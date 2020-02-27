@@ -63,10 +63,10 @@ def test_medium():
         random_test(5, 1_000, dtype)
 
 
-def test_casts():
+def test_minimize_dtype():
     for _ in range(1000):
         dtype = random.choice(["uint8", "uint16", "uint32", "uint64"])
-        inp = randint_type(10, dtype)
+        inp = randint_type(100, dtype)
         inp = random_shift(inp)
         inp = random_cast(inp)
         assert _minimize_dtype(inp).dtype.itemsize == np.dtype(dtype).itemsize, inp
