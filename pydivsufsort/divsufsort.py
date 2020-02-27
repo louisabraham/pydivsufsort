@@ -36,7 +36,7 @@ def _minimize_dtype(inp: np.ndarray):
     if inp.dtype == np.dtype("uint8"):
         return inp
     inp_min = inp.min()
-    n_bits = int(inp.max() - inp_min + 1).bit_length()
+    n_bits = int(inp.max() - inp_min).bit_length()
     n_bytes = (n_bits + 7) // 8
     # power of 2
     n_bytes = 1 << (n_bytes - 1).bit_length()
