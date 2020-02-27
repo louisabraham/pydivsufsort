@@ -37,10 +37,6 @@ def random_cast(inp):
     return inp.astype(dtype)
 
 
-def random_shift(inp):
-    return inp + randint_type(1, inp.dtype)
-
-
 def random_test(repetitions, size, dtype):
     for _ in range(repetitions):
         inp = randint_type(size, dtype)
@@ -64,9 +60,8 @@ def test_medium():
 
 
 def test_minimize_dtype():
-    for _ in range(1000):
+    for _ in range(10000):
         dtype = random.choice(["uint8", "uint16", "uint32", "uint64"])
         inp = randint_type(100, dtype)
-        inp = random_shift(inp)
         inp = random_cast(inp)
         assert _minimize_dtype(inp).dtype.itemsize == np.dtype(dtype).itemsize, inp
