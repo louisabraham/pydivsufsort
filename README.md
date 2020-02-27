@@ -1,2 +1,3 @@
 1. `pip install .`
-2. `cd examples && python example.py`
+2. `pytest`
+
