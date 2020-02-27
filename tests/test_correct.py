@@ -3,6 +3,7 @@ from functools import partial
 
 
 from pydivsufsort import divsufsort
+from pydivsufsort.divsufsort import _SUPPORTED_DTYPES
 from reference import suffix_array
 import numpy as np
 
@@ -31,23 +32,17 @@ def random_test(repetitions, size, dtype):
         assert_correct(inp)
 
 
-test_small = partial(random_test, 1000, 10, np.uint8)
-
-
 def test_containers():
     inp = random_type(10, np.uint8)
     for cast in CASTS:
         assert_correct(cast(inp))
 
 
-test_medium = partial(random_test, 10, 10_000, np.uint8)
+def test_small():
+    for dtype in _SUPPORTED_DTYPES:
+        random_test(100, 10, dtype)
 
 
-def test_small_bigint():
-    for dtype in [np.uint16, np.uint32, np.uint64]:
-        random_test(1000, 10, np.uint8)
-
-
-def test_big_bigint():
-    for dtype in [np.uint16, np.uint32, np.uint64]:
-        random_test(10, 10_000, np.uint8)
+def test_medium():
+    for dtype in _SUPPORTED_DTYPES:
+        random_test(5, 1_000, dtype)

@@ -12,20 +12,39 @@ def _pointer_frombuffer(inp):
     return ctypes.byref(inp)
 
 
+def _as_unsigned(inp: np.ndarray):
+    """preserves the order of the elements
+    """
+    mapping = {
+        np.dtype(f"int{bits}"): np.dtype(f"uint{bits}") for bits in [8, 16, 32, 64]
+    }
+    dtype = inp.dtype
+    if dtype not in mapping:
+        return inp
+    lastbit = np.iinfo(inp.dtype).max + 1
+    return inp.astype(mapping[dtype]) ^ lastbit
+
+
+_SUPPORTED_DTYPES = {
+    np.dtype(f"{signed}int{bits}") for signed in ["", "u"] for bits in [8, 16, 32, 64]
+}
+
+
 def divsufsort(inp):
     if isinstance(inp, np.ndarray):
-        if not inp.flags["C_CONTIGUOUS"]:
-            # Make a contiguous copy of the numpy array.
-            inp = np.ascontiguousarray(inp)
         if inp.dtype == np.uint8:
+            if not inp.flags["C_CONTIGUOUS"]:
+                # Make a contiguous copy of the numpy array.
+                inp = np.ascontiguousarray(inp)
             inp_p = ctypes.pointer(np.ctypeslib.as_ctypes(inp))
-        elif inp.dtype in [np.uint16, np.uint32, np.uint64]:
+        elif inp.dtype in _SUPPORTED_DTYPES:
+            inp = _as_unsigned(inp)
             dtype = inp.dtype
             inp = inp.astype(dtype.newbyteorder(">")).view("uint8")
             out = divsufsort(inp)
             return out[out % dtype.itemsize == 0] // dtype.itemsize
         else:
-            raise TypeError
+            raise TypeError(inp.dtype)
     elif isinstance(inp, array):
         assert inp.typecode == "B"
         inp_p = _pointer_frombuffer(inp)
