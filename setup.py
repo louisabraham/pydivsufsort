@@ -10,10 +10,13 @@ from distutils.command.install import install as _install
 # https://stackoverflow.com/a/45150383
 try:
     from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+
     class bdist_wheel(_bdist_wheel):
         def finalize_options(self):
             _bdist_wheel.finalize_options(self)
             self.root_is_pure = False
+
+
 except ImportError:
     bdist_wheel = None
 
@@ -31,7 +34,7 @@ class install(_install):
         super().run()
 
 
-def read(fname):    
+def read(fname):
     return (Path(__file__).parent / fname).open().read()
 
 
@@ -46,10 +49,9 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/louisabraham/pydivsufsort",
     packages=["pydivsufsort"],
-    package_data={'pydivsufsort': ['libdivsufsort.*', 'libdivsufsort64.*']},
+    package_data={"pydivsufsort": ["libdivsufsort.*", "libdivsufsort64.*"]},
     python_requires=">=3.5",
     install_requires=["numpy"],
     classifiers=[],
-    cmdclass={'build': build, 'bdist_wheel': bdist_wheel, 'install': install},
+    cmdclass={"build": build, "bdist_wheel": bdist_wheel, "install": install},
 )
-
