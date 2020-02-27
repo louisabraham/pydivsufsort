@@ -12,17 +12,35 @@ def _pointer_frombuffer(inp):
     return ctypes.byref(inp)
 
 
+_SIGNED_TO_UNSIGNED = {
+    np.dtype(f"int{bits}"): np.dtype(f"uint{bits}") for bits in [8, 16, 32, 64]
+}
+
+
 def _as_unsigned(inp: np.ndarray):
-    """preserves the order of the elements
+    """Casts to the corresponding unsigned dtype
+    and preserves the order of the elements
     """
-    mapping = {
-        np.dtype(f"int{bits}"): np.dtype(f"uint{bits}") for bits in [8, 16, 32, 64]
-    }
     dtype = inp.dtype
-    if dtype not in mapping:
+    if dtype not in _SIGNED_TO_UNSIGNED:
         return inp
     lastbit = np.iinfo(inp.dtype).max + 1
-    return inp.astype(mapping[dtype]) ^ lastbit
+    return inp.astype(_SIGNED_TO_UNSIGNED[dtype]) ^ lastbit
+
+
+def _minimize_dtype(inp: np.ndarray):
+    """
+    Returns an array with a smaller dtype and big endian
+    inp is supposed unsigned
+    """
+    if inp.dtype == np.dtype("uint8"):
+        return inp
+    inp_min = inp.min()
+    n_bits = int(inp.max() - inp_min + 1).bit_length()
+    n_bytes = (n_bits + 7) // 8
+    # power of 2
+    n_bytes = 1 << (n_bytes - 1).bit_length()
+    return (inp - inp_min).astype(f">u{n_bytes}")
 
 
 _SUPPORTED_DTYPES = {
@@ -38,10 +56,9 @@ def divsufsort(inp):
                 inp = np.ascontiguousarray(inp)
             inp_p = ctypes.pointer(np.ctypeslib.as_ctypes(inp))
         elif inp.dtype in _SUPPORTED_DTYPES:
-            inp = _as_unsigned(inp)
+            inp = _minimize_dtype(_as_unsigned(inp))
             dtype = inp.dtype
-            inp = inp.astype(dtype.newbyteorder(">")).view("uint8")
-            out = divsufsort(inp)
+            out = divsufsort(inp.view("uint8"))
             return out[out % dtype.itemsize == 0] // dtype.itemsize
         else:
             raise TypeError(inp.dtype)
