@@ -8,3 +8,8 @@ install:
   - python -m pip install .
 script:
   - pytest
+deploy:
+  provider: pypi
+  user: "__token__"
+  password:
+    secure: "RUcy9D0U19/atLb88ZM84JFLbR0MtPGFIykUb6sTsNrq8vqKMgjvnnO1JLawtvy+3l/A1E+1soZVsy/FjXQR9XKzjxc4nzyJedShg8/1UgDhO2LN2YvgNIqZOZi6J6Ryt+J40jLM4eCsJ3aitFVKGJQM+yn0dTHfdeyoJys3odAiMeRNQHjL+hDHQxLvMcCez3Vp6YJYaclBK+alKw/8DKyMl0HQJSEpAyauAs+jk2CMc1ISMPWdB2jGQSVPomJr1ELP9mwbcgd3iQURHnXDNvHiu9yiPh3AGLlL+peEumK5+fw3JbX8iCl71BB5wHohAywVhOcFbMF9SwwjMFrj/x8u70RqXiG+fMA08l1syLvcKPVo8cAVEFVQNB0TIJnVtWo+cOhWg0XtCtfIaZQepon/IG3W3RMmpVTgTxRNN4qD1W7ZPdWGPVbOZoRcZ56iHMI1SH1XUiGSebb9oACBsyowdsfurWg4Azh3NGj4HcQjrlkyWIBBuZHCRpl7f+N69U+KZjR827zio67dxGRF1EY7ZcvIUZqojpcgkBqE9lj5WsW6KGP7r8dAJ3prXahaiNEYs4ggywMaBkKmnUDZfjiF97Gl2NbvIE3jAFyx41FngPxLVPG/fpSkXBpAChagNkw4eNfEwwNuYg8lyFI5ICZvRuaJzEOXpQcEuG5dRtQ="
