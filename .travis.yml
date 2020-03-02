@@ -3,14 +3,16 @@ jobs:
   include:
     # perform a linux build
     - services: docker
+      python: 3.6
     # and a mac build
     - os: osx
       language: shell
+      python: 3.6
     # and a windows build
     - os: windows
       language: shell
       before_install:
-        - choco install python --version 3.8.0
+        - choco install python --version 3.6.0
         - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
 secure: "liolhxYG0QEvjN+M/dZDQwizknwIkoKUJqpTRzUL1RbJh0sRkuYBpyKVz2QjGs8kaT6j41/WkUu/jMMKZ5TN+7lAN77CvfWmJuWkHwRAAV/xh30PR9rB5E5WJLadCH301GT9VJe8KnQ0levpHbMjK+nkcsgnMdRwa8+bH5t/NBjwuiLDvVhhbKN8FG5Qu8TTDnkOQ8sH3xdb+g/O14M27Cy/f1jC+4nb0/Yu6LrncTzGD4R7yisu2akjGLe5HL83iAM4Oj8c67+JCZCw6WRxh/QcoAIOd8ISnNyHdtUFYToQRdrktjht2nqi/6nkHp2Z9CcvVMmTBM3e2rQINFHBdhaG8oZyECeL9RLZaT89OFkuweLGkIKA1jSiw5QV0jLriKT+kTEBzMxFqIbY1wdxytx1f8G9IQ2nPsw7yhn/qCu3lW8qbG30PN2O42pwyk2AGbhqgrXerw0Y41I/V6+UftAqzc3GMvD+QrFIbNTBpSwTsgFt3Hul7jhlSeIR5kdzousgIUbNJyp0QLqd+FnbxOO0upEIJeMGRz7mbrdczw8CyE2FJjdurYVt0Oy9GUrvzIy/8/OFjTu5g+ajrhvvN1Q9OmUaSgioThwFIysHPXhczADEK/sRkU5Fhs/S27e7NUuxIxv6UFWIvYjMOWnrPMwOSlFVN8RQYVwC8za/VAs="
 env:
