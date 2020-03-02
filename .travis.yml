@@ -20,7 +20,7 @@ env:
     - TWINE_USERNAME=__token__
 
 install:
-  - python -m pip install . twine cibuildwheel
+  - python -m pip install . twine cibuildwheel==1.1.0
 script:
   - pytest
   - python -m cibuildwheel --output-dir wheelhouse
