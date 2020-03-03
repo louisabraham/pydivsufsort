@@ -11,7 +11,7 @@ includes it in a Python package with bindings.
 
 On Linux and macOS:
 ```
-pip install pydivsufsort
+python -m pip install pydivsufsort
 ```
 
 Untested on Windows.
@@ -28,9 +28,9 @@ pytest
 
 The precompiled libraries use OpenMP. You can disable it by setting the env variable `OMP_NUM_THREADS=1`, and it will yield the same performance as the version compiled without OpenMP
 
-The original `libdivsufsort` only supports char as the base type. `pydivsufsort` can handle arrays of any integer type (even signed), by encoding each element as multiple chars, which makes the computation slower. If your values use an integer type that is bigger than required, but they span over a small contiguous range, `pydivsufsort` will automatically change their type (see #6).
+The original `libdivsufsort` only supports char as the base type. `pydivsufsort` can handle arrays of any integer type (even signed), by encoding each element as multiple chars, which makes the computation slower. If your values use an integer type that is bigger than required, but they span over a small contiguous range, `pydivsufsort` will automatically change their type (see [#6](https://github.com/louisabraham/pydivsufsort/issues/6)).
 
 ## Acknowledgements
 
-- Yuta Mori (@y-256) for writing [libdivsufsort](https://github.com/y-256/libdivsufsort)
-- Sean Law (@seanlaw) for initiating this project and contributing
+- [Yuta Mori](https://github.com/y-256) for writing [libdivsufsort](https://github.com/y-256/libdivsufsort)
+- [Sean Law](https://github.com/seanlaw) for initiating this project and contributing
