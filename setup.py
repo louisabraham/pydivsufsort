@@ -51,7 +51,7 @@ setup(
     packages=["pydivsufsort"],
     package_data={"pydivsufsort": ["libdivsufsort.*", "libdivsufsort64.*"]},
     python_requires=">=3.5",
-    install_requires=["numpy"],
+    install_requires=["wheel", "numpy"],
     tests_require=["pytest"],
     classifiers=[],
     cmdclass={"build": build, "bdist_wheel": bdist_wheel, "install": install},
