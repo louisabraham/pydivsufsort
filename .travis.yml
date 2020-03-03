@@ -1,3 +1,5 @@
+notifications:
+  email: false
 language: python
 jobs:
   include:
@@ -16,11 +18,12 @@ jobs:
 env:
   global:
     - TWINE_USERNAME=__token__
+    - CIBW_BUILD="cp36-*"
 
 install:
   - python3 -m pip install cibuildwheel
 script:
-  - python -m cibuildwheel --output-dir wheelhouse
+  - python3 -m cibuildwheel --output-dir wheelhouse
   - ls wheelhouse
 after_success:
   - |
