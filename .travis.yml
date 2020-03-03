@@ -9,16 +9,16 @@ jobs:
     - os: osx
       language: shell
     # and a windows build
-    - os: windows
-      language: shell
-      before_install:
-        - choco install python --version 3.8.0
-        - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
-      install:
-       - /c/Python38/python.exe -m pip install cibuildwheel
-      script:
-        - /c/Python38/python.exe -m cibuildwheel --output-dir wheelhouse
-        - ls wheelhouse
+    # - os: windows
+    #   language: shell
+    #   before_install:
+    #     - choco install python --version 3.8.0
+    #     - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
+    #   install:
+    #    - /c/Python38/python.exe -m pip install cibuildwheel
+    #   script:
+    #     - /c/Python38/python.exe -m cibuildwheel --output-dir wheelhouse
+    #     - ls wheelhouse
 env:
   global:
     - TWINE_USERNAME=__token__
