@@ -23,6 +23,8 @@ env:
   global:
     - TWINE_USERNAME=__token__
     - CIBW_SKIP="cp27-* cp35-*"
+    - CIBW_TEST_REQUIRES=pytest
+    - CIBW_TEST_COMMAND=pytest
 
 install:
   - python3 -m pip install cibuildwheel
