@@ -22,7 +22,7 @@ jobs:
 env:
   global:
     - TWINE_USERNAME=__token__
-    - CIBW_BUILD="cp3?-*"
+    - CIBW_SKIP="cp27-* cp35-*"
 
 install:
   - python3 -m pip install cibuildwheel
@@ -30,8 +30,5 @@ script:
   - python3 -m cibuildwheel --output-dir wheelhouse
   - ls wheelhouse
 after_success:
-  - |
-    if [[ $TRAVIS_TAG ]]; then
-      python3 -m pip install twine
-      python3 -m twine upload wheelhouse/*.whl
-    fi
+  - python3 -m pip install twine
+  - python3 -m twine upload --skip-existing wheelhouse/*.whl

@@ -33,6 +33,7 @@ class install(_install):
     def run(self):
         super().run()
 
+
 # from https://github.com/IntelRealSense/librealsense/blob/master/wrappers/python/setup.py
 class EmptyListWithLength(list):
     def __len__(self):
@@ -43,10 +44,9 @@ def read(fname):
     return (Path(__file__).parent / fname).open().read()
 
 
-
 setup(
     name="pydivsufsort",
-    version="0.0",
+    version="0.0.1",
     author="Louis Abraham",
     license="MIT",
     author_email="louis.abraham@yahoo.fr",
@@ -56,8 +56,8 @@ setup(
     url="https://github.com/louisabraham/pydivsufsort",
     packages=["pydivsufsort"],
     package_data={"pydivsufsort": ["libdivsufsort.*", "libdivsufsort64.*"]},
-    ext_modules=EmptyListWithLength(), # needed to make the libraries platlib
-    python_requires=">=3.5",
+    ext_modules=EmptyListWithLength(),  # needed to make the libraries platlib
+    python_requires=">=3.6",
     install_requires=["wheel", "numpy"],
     tests_require=["pytest"],
     classifiers=[],
