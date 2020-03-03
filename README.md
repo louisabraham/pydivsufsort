@@ -22,6 +22,14 @@ Untested on Windows.
 pytest
 ```
 
+## Technical details (for performance tweaks)
+
+`libdivsufsort` is compiled in both 32 and 64 bits, as [the 32 bits version is faster](https://github.com/y-256/libdivsufsort/issues/21). `pydivsufsort` automatically chooses to use the 32 bits version when possible (aka when the input size is less than `2**31-1`).
+
+The precompiled libraries use OpenMP. You can disable it by setting the env variable `OMP_NUM_THREADS=1`, and it will yield the same performance as the version compiled without OpenMP
+
+The original `libdivsufsort` only supports char as the base type. `pydivsufsort` can handle arrays of any integer type (even signed), by encoding each element as multiple chars, which makes the computation slower. If your values use an integer type that is bigger than required, but they span over a small contiguous range, `pydivsufsort` will automatically change their type (see #6).
+
 ## Acknowledgements
 
 - Yuta Mori (@y-256) for writing [libdivsufsort](https://github.com/y-256/libdivsufsort)
