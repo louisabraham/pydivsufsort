@@ -9,6 +9,7 @@ rm -rf tempbuild
 mkdir tempbuild
 cd tempbuild
 cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF -DUSE_OPENMP=ON ../libdivsufsort
+ls
 make
 cd ..
 # copy the two largest files, aka the dll of libdivsufsort and libdivsufsort64
