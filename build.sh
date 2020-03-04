@@ -14,7 +14,7 @@ git submodule update
 rm -rf tempbuild
 mkdir tempbuild
 cd tempbuild
-cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF -DUSE_OPENMP=ON -A x64 ../libdivsufsort
+cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF -DUSE_OPENMP=ON -A ARM ../libdivsufsort
 if [ $TRAVIS_OS_NAME = 'windows' ]; then
     cmake --build . --config Release
     OUTPATH="tempbuild/examples/Release/divsufsort"
