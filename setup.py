@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from pathlib import Path
+import platform
 from subprocess import Popen
 from setuptools import setup
 from distutils.command.build import build as _build
@@ -24,7 +25,10 @@ except ImportError:
 class build(_build):
     def run(self):
         script = Path(__file__).parent / "build.sh"
-        Popen([str(script.absolute())]).wait()
+        if platform.system() == "Windows":
+            Popen(["bash.exe", "-c", str(script.absolute())]).wait()
+        else:
+            Popen([script.absolute().as_posix()], shell=True, executable="/bin/bash").wait()
         super().run()
 
 
