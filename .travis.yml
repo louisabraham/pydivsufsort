@@ -10,5 +10,5 @@ before_install:
   - /c/Python38/python.exe -m pip install -U setuptools distutils wheel
 
 install:
-  - ./build.sh
+  # - ./build.sh
   - /c/Python38/python.exe -m pip install .
