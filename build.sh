@@ -8,6 +8,10 @@ cd "${0%/*}"
 git submodule init
 git submodule update
 
+echo ----
+echo $PLATFORM_OPTION
+echo ----
+
 rm -rf tempbuild
 mkdir tempbuild
 cd tempbuild

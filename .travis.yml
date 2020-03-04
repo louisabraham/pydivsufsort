@@ -13,15 +13,17 @@ jobs:
     - os: osx
       env:
         - PYTHON=python3
+    # win_amd64 build
     - os: windows
+      before_install:
+        - choco install python --version 3.8.0
+        - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
       env:
         - CIBW_BUILD="*-win_amd64"
         - PLATFORM_OPTION="-A Win32"
         - CIBW_BEFORE_BUILD="bash build.sh"
         - PYTHON=/c/Python38/python.exe
-      before_install:
-        - choco install python --version 3.8.0
-        - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
+    # win32 build
     - os: windows
       before_install:
         - choco install python --version 3.8.0
