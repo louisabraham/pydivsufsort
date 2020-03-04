@@ -61,7 +61,16 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/louisabraham/pydivsufsort",
     packages=["pydivsufsort"],
-    package_data={"pydivsufsort": ["libdivsufsort.*", "libdivsufsort64.*"]},
+    package_data={
+        "pydivsufsort": [
+            # unix
+            "libdivsufsort.*",
+            "libdivsufsort64.*",
+            # windows
+            "divsufsort.dll",
+            "divsufsort64.dll",
+        ]
+    },
     ext_modules=EmptyListWithLength(),  # needed to make the libraries platlib
     python_requires=">=3.6",
     install_requires=["wheel", "numpy"],

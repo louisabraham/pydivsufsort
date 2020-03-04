@@ -1,7 +1,5 @@
-
 from pathlib import Path
 from subprocess import Popen
-
 
 
 script = Path(__file__).parent / "test.sh"
