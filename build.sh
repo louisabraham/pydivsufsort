@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# doesn't work on Windows
+# we assume we always launch the script
+# from its parent directory
 cd "${0%/*}"
 
 git submodule init
@@ -12,14 +15,16 @@ cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF -DUSE_OPENMP=ON ../libdivsufs
 if [ $TRAVIS_OS_NAME = 'windows' ]; then
     cmake --build . --config Release
     OUTPATH="tempbuild/examples/Release/divsufsort"
+    touch .built
 else
     make
     OUTPATH="tempbuild/lib/libdivsufsort"
 fi
 cd ..
-echo $OUTPATH
-ls $OUTPATH*
 # copy the two largest files, aka the dll of divsufsort and divsufsort64
 mv $(du $OUTPATH* | sort -nr | head -n2 | cut -f2) pydivsufsort
 rm -rf tempbuild
-touch .built
+
+echo "-----"
+ls pydivsufsort
+echo "-----"
