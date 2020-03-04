@@ -10,9 +10,6 @@ before_install:
   - /c/Python38/python.exe -m pip install -U wheel
 
 install:
-  # - ./build.sh
-  - which bash
-  - /c/Python38/python.exe test.py
+  - ./build.sh
   - ls
-  # - /c/Python38/python.exe setup.py bdist_wheel
-  # - ls
+  - /c/Python38/python.exe setup.py bdist_wheel

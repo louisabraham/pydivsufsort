@@ -24,12 +24,11 @@ except ImportError:
 
 class build(_build):
     def run(self):
-        script = Path(__file__).parent / "build.sh"
         if platform.system() == "Windows":
-            path = str(script.absolute()).replace("\\", r"\\")
-            print(path)
-            Popen(["bash.exe", "-c", path]).wait()
+            witness = Path(__file__).parent / ".built"
+            assert witness.exists(), "Launch ./build.sh first"
         else:
+            script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
             Popen([path], shell=True, executable="/bin/bash").wait()
         super().run()
