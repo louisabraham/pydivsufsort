@@ -24,7 +24,7 @@ except ImportError:
 class build(_build):
     def run(self):
         script = Path(__file__).parent / "build.sh"
-        # Popen([script.absolute().as_posix()], shell=True, executable="/bin/bash").wait()
+        Popen([str(script.absolute())]).wait()
         super().run()
 
 
