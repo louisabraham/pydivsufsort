@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from pathlib import Path
+import platform
 from subprocess import Popen
 from setuptools import setup
 from distutils.command.build import build as _build
@@ -23,8 +24,13 @@ except ImportError:
 
 class build(_build):
     def run(self):
-        script = Path(__file__).parent / "build.sh"
-        Popen([script.absolute().as_posix()], shell=True, executable="/bin/bash").wait()
+        if platform.system() == "Windows":
+            witness = Path(__file__).parent / "pydivsufsort/divsufsort.dll"
+            assert witness.exists(), "Launch ./build.sh first"
+        else:
+            script = Path(__file__).parent / "build.sh"
+            path = script.absolute().as_posix()
+            Popen([path], shell=True, executable="/bin/bash").wait()
         super().run()
 
 
@@ -55,7 +61,16 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/louisabraham/pydivsufsort",
     packages=["pydivsufsort"],
-    package_data={"pydivsufsort": ["libdivsufsort.*", "libdivsufsort64.*"]},
+    package_data={
+        "pydivsufsort": [
+            # unix
+            "libdivsufsort.*",
+            "libdivsufsort64.*",
+            # windows
+            "divsufsort.dll",
+            "divsufsort64.dll",
+        ]
+    },
     ext_modules=EmptyListWithLength(),  # needed to make the libraries platlib
     python_requires=">=3.6",
     install_requires=["wheel", "numpy"],

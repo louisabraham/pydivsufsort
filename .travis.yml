@@ -1,24 +1,38 @@
 notifications:
   email: false
-language: python
+language: shell
+
 jobs:
   include:
-    # perform a linux build
+    # linux build
     - services: docker
-    # and a mac build
+      language: python
+      env:
+        - PYTHON=python3
+    # macos build
     - os: osx
-      language: shell
-    # and a windows build
-    # - os: windows
-    #   language: shell
-    #   before_install:
-    #     - choco install python --version 3.8.0
-    #     - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
-    #   install:
-    #    - /c/Python38/python.exe -m pip install cibuildwheel
-    #   script:
-    #     - /c/Python38/python.exe -m cibuildwheel --output-dir wheelhouse
-    #     - ls wheelhouse
+      env:
+        - PYTHON=python3
+    # win_amd64 build
+    - os: windows
+      before_install:
+        - choco install python --version 3.8.0
+        - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
+      env:
+        - CIBW_BUILD="*-win_amd64"
+        - PLATFORM_OPTION="-A x64"
+        - CIBW_BEFORE_BUILD="bash build.sh"
+        - PYTHON=/c/Python38/python.exe
+    # win32 build
+    - os: windows
+      before_install:
+        - choco install python --version 3.8.0
+        - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
+      env:
+        - CIBW_BUILD="*-win32"
+        - CIBW_BEFORE_BUILD="bash build.sh"
+        - PYTHON=/c/Python38/python.exe
+
 env:
   global:
     - TWINE_USERNAME=__token__
@@ -27,10 +41,12 @@ env:
     - CIBW_TEST_COMMAND="pytest {project}"
 
 install:
-  - python3 -m pip install cibuildwheel
+  - $PYTHON -m pip install cibuildwheel
+
 script:
-  - python3 -m cibuildwheel --output-dir wheelhouse
+  - $PYTHON -m cibuildwheel --output-dir wheelhouse
   - ls wheelhouse
+
 after_success:
   - |
     if [[ $TWINE_PASSWORD  ]]; then

@@ -19,7 +19,7 @@ d = time()
 divsufsort(random_string)
 print(time() - d)
 
-random_string = np.random.randint(255, size=n, dtype=np.uint64)
+random_string = random_string.astype(np.uint64)
 
 d = time()
 divsufsort(random_string)
