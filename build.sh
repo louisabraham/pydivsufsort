@@ -5,9 +5,6 @@
 # from its parent directory
 cd "${0%/*}"
 
-rm pydivsufsort/libdivsufsort*
-rm pydivsufsort/*.dll
-
 git submodule init
 git submodule update
 
@@ -23,10 +20,8 @@ else
     OUTPATH="tempbuild/lib/libdivsufsort"
 fi
 cd ..
+
 # copy the two largest files, aka the dll of divsufsort and divsufsort64
 mv $(du $OUTPATH* | sort -nr | head -n2 | cut -f2) pydivsufsort
 rm -rf tempbuild
 
-echo "-----"
-ls pydivsufsort
-echo "-----"

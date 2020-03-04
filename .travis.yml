@@ -5,31 +5,29 @@ language: shell
 jobs:
   include:
     - os: windows
+      env:
+        - CIBW_BUILD="*-win_amd64"
+        - PLATFORM_OPTION="-A Win32"
+        - CIBW_BEFORE_BUILD="bash build.sh"
+        - PYTHON=/c/Python38/python.exe
       before_install:
         - choco install python --version 3.8.0
         - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
-      env:
-        global:
-            - CIBW_BUILD="*-win_amd64"
-            - PLATFORM_OPTION=-A Win32
-            - CIBW_BEFORE_BUILD="bash build.sh"
-            - PYTHON=/c/Python38/python.exe
     - os: windows
       before_install:
         - choco install python --version 3.8.0
         - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
       env:
-        global:
-            - CIBW_BUILD="*-win32"
-            - CIBW_BEFORE_BUILD="bash build.sh"
-            - PYTHON=/c/Python38/python.exe
+        - CIBW_BUILD="*-win32"
+        - CIBW_BEFORE_BUILD="bash build.sh"
+        - PYTHON=/c/Python38/python.exe
 
 env:
-  global:
-    - CIBW_SKIP="cp27-* cp35-*"
-    - CIBW_TEST_REQUIRES=pytest
-    - CIBW_TEST_COMMAND="pytest {project}"
     - PYTHON=python3
+    - global:
+        - CIBW_SKIP="cp27-* cp35-*"
+        - CIBW_TEST_REQUIRES=pytest
+        - CIBW_TEST_COMMAND="pytest {project}"
 install:
   - $PYTHON -m pip install cibuildwheel
 script:
