@@ -5,25 +5,40 @@ language: shell
 jobs:
   include:
     - os: windows
+      before_install:
+        - choco install python --version 3.8.0
+        - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
+      env:
+        global:
+            - CIBW_BUILD="*-win_amd64"
+            - PLATFORM_OPTION=-A Win32
+            - CIBW_BEFORE_BUILD="bash build.sh"
+            - PYTHON=/c/Python38/python.exe
+    - os: windows
+      before_install:
+        - choco install python --version 3.8.0
+        - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
+      env:
+        global:
+            - CIBW_BUILD="*-win32"
+            - CIBW_BEFORE_BUILD="bash build.sh"
+            - PYTHON=/c/Python38/python.exe
+
 env:
   global:
-#    - CIBW_SKIP="cp27-* cp35-* *-win_amd64"
-    - CIBW_BUILD="cp36-win_amd64"
+    - CIBW_SKIP="cp27-* cp35-*"
     - CIBW_TEST_REQUIRES=pytest
     - CIBW_TEST_COMMAND="pytest {project}"
-    - CIBW_BEFORE_BUILD="bash build.sh"
-before_install:
-  - choco install python --version 3.8.0
-  - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
+    - PYTHON=python3
 install:
-  - /c/Python38/python.exe -m pip install cibuildwheel
+  - $PYTHON -m pip install cibuildwheel
 script:
-  - /c/Python38/python.exe -m cibuildwheel --output-dir wheelhouse
+  - $PYTHON -m cibuildwheel --output-dir wheelhouse
   - ls wheelhouse
 
-# after_success:
-#   - |
-#     if [[ $TWINE_PASSWORD  ]]; then
-#       python3 -m pip install twine
-#       python3 -m twine upload --skip-existing wheelhouse/*.whl
-#     fi
+after_success:
+  - |
+    if [[ $TWINE_PASSWORD  ]]; then
+      python3 -m pip install twine
+      python3 -m twine upload --skip-existing wheelhouse/*.whl
+    fi
