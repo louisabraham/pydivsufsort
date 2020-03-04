@@ -6,6 +6,7 @@ jobs:
     - os: windows
 before_install:
   - choco install python --version=3.7
+  - choco install make
 install:
   - ./build.sh
-  - /c/Python38/python.exe -m pip install .
+  - python.exe -m pip install .
