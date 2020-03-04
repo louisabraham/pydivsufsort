@@ -1,10 +1,11 @@
 notifications:
   email: false
-language: python
+language: shell
 jobs:
   include:
     - os: windows
 before_install:
+  - choco install python --version=3.7
   - choco install cmake.portable
   - choco install git.portable
 install:
