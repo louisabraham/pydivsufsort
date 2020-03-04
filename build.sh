@@ -9,8 +9,14 @@ rm -rf tempbuild
 mkdir tempbuild
 cd tempbuild
 cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF -DUSE_OPENMP=ON ../libdivsufsort
-cmake --build . --config Release
+if [ $TRAVIS_OS_NAME = 'windows' ]; then
+    cmake --build . --config Release
+    OUTPATH="tempbuild/examples/Release"
+else
+    make
+    OUTPATH="tempbuild/lib"
+fi
 cd ..
 # copy the two largest files, aka the dll of libdivsufsort and libdivsufsort64
-mv $(du tempbuild/examples/Release/libdivsufsort* | sort -nr | head -n2 | cut -f2) pydivsufsort
+mv $(du $OUTPATH/libdivsufsort* | sort -nr | head -n2 | cut -f2) pydivsufsort
 rm -rf tempbuild
