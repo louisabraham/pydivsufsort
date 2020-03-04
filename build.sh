@@ -16,7 +16,7 @@ mkdir tempbuild
 cd tempbuild
 cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF -DUSE_OPENMP=ON ../libdivsufsort
 if [ $TRAVIS_OS_NAME = 'windows' ]; then
-    cmake --build --config Release -A ARM64 .
+    cmake --build . --config Release -A ARM64
     OUTPATH="tempbuild/examples/Release/divsufsort"
 else
     make
