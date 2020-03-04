@@ -13,7 +13,7 @@ env:
     - CIBW_BEFORE_BUILD="bash build.sh"
 before_install:
   - choco install python --version 3.8.0
-  - choco install git.install --params "/GitAndUnixToolsOnPath"
+  # - choco install git.install --params "/GitAndUnixToolsOnPath"
   - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
 install:
   - /c/Python38/python.exe -m pip install cibuildwheel

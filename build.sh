@@ -17,6 +17,8 @@ else
     OUTPATH="tempbuild/lib"
 fi
 cd ..
+echo $OUTPATH
+ls $OUTPATH
 # copy the two largest files, aka the dll of libdivsufsort and libdivsufsort64
 mv $(du $OUTPATH/libdivsufsort* | sort -nr | head -n2 | cut -f2) pydivsufsort
 rm -rf tempbuild
