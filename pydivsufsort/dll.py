@@ -4,6 +4,10 @@ import platform
 
 PATH = Path(__file__).parent
 
+print("----------")
+print(platform.system())
+print("----------")
+
 if platform.system() == "Windows":
     PATH_LIBDIVSUFSORT = str(next(PATH.glob("divsufsort.dll")))
     PATH_LIBDIVSUFSORT64 = str(next(PATH.glob("divsufsort64.dll")))
