@@ -7,7 +7,7 @@ jobs:
 before_install:
   - choco install python --version=3.8
   - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
-  - /c/Python38/python.exe -m pip install -U setuptools wheel
+  - /c/Python38/python.exe -m pip install -U setuptools distutils wheel
 
 install:
   - ./build.sh
