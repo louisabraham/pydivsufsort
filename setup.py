@@ -25,7 +25,7 @@ except ImportError:
 class build(_build):
     def run(self):
         if platform.system() == "Windows":
-            witness = Path(__file__).parent / ".built"
+            witness = Path(__file__).parent / "pydivsufsort/divsufsort.dll"
             assert witness.exists(), "Launch ./build.sh first"
         else:
             script = Path(__file__).parent / "build.sh"

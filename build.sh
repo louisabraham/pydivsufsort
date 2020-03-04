@@ -5,6 +5,9 @@
 # from its parent directory
 cd "${0%/*}"
 
+rm pydivsufsort/libdivsufsort*
+rm pydivsufsort/*.dll
+
 git submodule init
 git submodule update
 
@@ -15,7 +18,6 @@ cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF -DUSE_OPENMP=ON ../libdivsufs
 if [ $TRAVIS_OS_NAME = 'windows' ]; then
     cmake --build . --config Release
     OUTPATH="tempbuild/examples/Release/divsufsort"
-    touch ../.built
 else
     make
     OUTPATH="tempbuild/lib/libdivsufsort"
