@@ -7,8 +7,7 @@ jobs:
     - os: windows
 env:
   global:
-    - CIBW_SKIP="cp27-* cp35-*"
-    - CIBW_BUILD="cp36-win32"
+    - CIBW_SKIP="cp27-* cp35-* *-win_amd64"
     - CIBW_TEST_REQUIRES=pytest
     - CIBW_TEST_COMMAND="pytest {project}"
     - CIBW_BEFORE_BUILD="bash build.sh"
