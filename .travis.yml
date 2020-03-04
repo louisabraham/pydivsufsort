@@ -9,4 +9,3 @@ before_install:
   - choco install make
 install:
   - ./build.sh
-  - python -m pip install .
