@@ -4,6 +4,15 @@ language: shell
 
 jobs:
   include:
+    # linux build
+    - services: docker
+      language: python
+      env:
+        - PYTHON=python3
+    # macos build
+    - os: osx
+      env:
+        - PYTHON=python3
     - os: windows
       env:
         - CIBW_BUILD="*-win_amd64"
@@ -23,13 +32,15 @@ jobs:
         - PYTHON=/c/Python38/python.exe
 
 env:
-    - PYTHON=python3
-    - global:
-        - CIBW_SKIP="cp27-* cp35-*"
-        - CIBW_TEST_REQUIRES=pytest
-        - CIBW_TEST_COMMAND="pytest {project}"
+  global:
+    - TWINE_USERNAME=__token__
+    - CIBW_SKIP="cp27-* cp35-*"
+    - CIBW_TEST_REQUIRES=pytest
+    - CIBW_TEST_COMMAND="pytest {project}"
+
 install:
   - $PYTHON -m pip install cibuildwheel
+
 script:
   - $PYTHON -m cibuildwheel --output-dir wheelhouse
   - ls wheelhouse
