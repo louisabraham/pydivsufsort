@@ -12,3 +12,4 @@ before_install:
 install:
   # - ./build.sh
   - /c/Python38/python.exe setup.py bdist_wheel
+  - ls
