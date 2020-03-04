@@ -16,7 +16,7 @@ ls lib
 echo "-----"
 ls lib/Release
 echo "-----"
-ls lib/examples/Release
+ls examples/Release
 echo "-----"
 
 cd ..
