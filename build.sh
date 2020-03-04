@@ -15,7 +15,7 @@ cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF -DUSE_OPENMP=ON ../libdivsufs
 if [ $TRAVIS_OS_NAME = 'windows' ]; then
     cmake --build . --config Release
     OUTPATH="tempbuild/examples/Release/divsufsort"
-    touch .built
+    touch ../.built
 else
     make
     OUTPATH="tempbuild/lib/libdivsufsort"
