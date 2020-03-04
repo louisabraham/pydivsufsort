@@ -10,7 +10,7 @@ env:
     - CIBW_SKIP="cp27-* cp35-*"
     - CIBW_TEST_REQUIRES=pytest
     - CIBW_TEST_COMMAND="pytest {project}"
-    - CIBW_BEFORE_BUILD="./build.sh && ls -a"
+    - CIBW_BEFORE_BUILD="./build.sh"
 before_install:
   - choco install python --version 3.8.0
   - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
