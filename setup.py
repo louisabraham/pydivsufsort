@@ -26,9 +26,12 @@ class build(_build):
     def run(self):
         script = Path(__file__).parent / "build.sh"
         if platform.system() == "Windows":
-            Popen(["bash.exe", "-c", str(script.absolute())]).wait()
+            path = str(script.absolute())).replace("\\", r"\\")
+            print(path)
+            Popen(["bash.exe", "-c", path]).wait()
         else:
-            Popen([script.absolute().as_posix()], shell=True, executable="/bin/bash").wait()
+            path = script.absolute().as_posix()
+            Popen([path], shell=True, executable="/bin/bash").wait()
         super().run()
 
 
