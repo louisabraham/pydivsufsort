@@ -78,7 +78,7 @@ setup(
         "pydivsufsort/stringalg.pyx", include_path=[numpy.get_include()]
     ),  # needed to make the libraries platlib
     python_requires=">=3.6",
-    install_requires=["wheel", "numpy"],
+    install_requires=["wheel", "numpy", "Cython"],
     tests_require=["pytest"],
     classifiers=[],
     cmdclass={"build": build, "bdist_wheel": bdist_wheel, "install": install},
