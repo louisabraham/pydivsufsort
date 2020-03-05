@@ -4,6 +4,7 @@ from pathlib import Path
 import platform
 from subprocess import Popen
 from setuptools import setup
+from setuptools import Extension
 from distutils.command.build import build as _build
 from distutils.command.install import install as _install
 from Cython.Build import cythonize
@@ -53,6 +54,14 @@ def read(fname):
     return (Path(__file__).parent / fname).open().read()
 
 
+extensions = [
+    Extension(
+        "pydivsufsort.stringalg",
+        ["pydivsufsort/stringalg.pyx"],
+        include_dirs=[numpy.get_include()],
+    )
+]
+
 setup(
     name="pydivsufsort",
     version="0.0.1",
@@ -74,9 +83,7 @@ setup(
             "divsufsort64.dll",
         ]
     },
-    ext_modules=cythonize(
-        "pydivsufsort/stringalg.pyx", include_path=[numpy.get_include()]
-    ),  # needed to make the libraries platlib
+    ext_modules=cythonize(extensions),
     python_requires=">=3.6",
     install_requires=["wheel", "numpy"],
     tests_require=["pytest"],
