@@ -38,10 +38,10 @@ jobs:
       arch: arm64
       install:
       script:
-        - python3 -m pip install -U setuptools pip wheel Cython numpy
-        - python3 setup.py sdist
         # without --no-cache:
-        # [Errno 13] Permission denied: '/home/travis/.cache/pip/wheels/3a'
+        # [Errno 13] Permission denied: '/home/travis/.cache/pip/wheels/'
+        - python3 -m pip install -U --no-cache setuptools pip wheel Cython numpy
+        - python3 setup.py sdist
         - python3 -m pip install --no-cache dist/*.tar.gz
         - pytest
       after_success:
