@@ -37,10 +37,8 @@ jobs:
       install:
       script:
         - python3 -m pip install -U setuptools pip wheel
-        - python3 -m pip install .
-        - python3 setup.py install
         - python3 setup.py sdist
-        - python3 -m pip install dist/*.tar.gz
+        - python3 -m pip install --no-cache dist/*.tar.gz
         - pytest
       after_success:
           - |
