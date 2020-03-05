@@ -36,7 +36,7 @@ jobs:
       arch: arm64
       install:
       script:
-        - python3 -m pip install -U setuptools pip pytest
+        - python3 -m pip install -U setuptools pip wheel
         - python3 -m pip install .
         - python3 setup.py install
         - python3 setup.py sdist
