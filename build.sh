@@ -10,7 +10,7 @@ git submodule update
 
 # very ugly, see https://github.com/joerick/cibuildwheel/issues/289
 if [ $TRAVIS_OS_NAME = 'windows' ]; then
-    $PYTHON -m pip install Cython numpy
+    pip install Cython numpy
 fi
 
 rm -rf tempbuild
