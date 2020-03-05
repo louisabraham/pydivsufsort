@@ -1,6 +1,8 @@
 *.so*
 *.dll
 
+pydivsufsort/*.c
+
 # editor saves
 *~
 

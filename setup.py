@@ -6,6 +6,9 @@ from subprocess import Popen
 from setuptools import setup
 from distutils.command.build import build as _build
 from distutils.command.install import install as _install
+from Cython.Build import cythonize
+
+import numpy
 
 # make the wheel platform specific
 # https://stackoverflow.com/a/45150383
@@ -71,7 +74,9 @@ setup(
             "divsufsort64.dll",
         ]
     },
-    ext_modules=EmptyListWithLength(),  # needed to make the libraries platlib
+    ext_modules=cythonize(
+        "pydivsufsort/stringalg.pyx", include_path=[numpy.get_include()]
+    ),  # needed to make the libraries platlib
     python_requires=">=3.6",
     install_requires=["wheel", "numpy"],
     tests_require=["pytest"],
