@@ -9,10 +9,12 @@ jobs:
       language: python
       env:
         - PYTHON=python3
+        - CIBW_BEFORE_BUILD="$PYTHON -m pip install Cython"
     # macos build
     - os: osx
       env:
         - PYTHON=python3
+        - CIBW_BEFORE_BUILD="$PYTHON -m pip install Cython"
     # win_amd64 build
     - os: windows
       before_install:
@@ -21,7 +23,7 @@ jobs:
       env:
         - CIBW_BUILD="*-win_amd64"
         - PLATFORM_OPTION="-A x64"
-        - CIBW_BEFORE_BUILD="bash build.sh"
+        - CIBW_BEFORE_BUILD="$PYTHON -m pip install Cython; bash build.sh"
         - PYTHON=/c/Python38/python.exe
     # win32 build
     - os: windows
@@ -30,7 +32,7 @@ jobs:
         - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
       env:
         - CIBW_BUILD="*-win32"
-        - CIBW_BEFORE_BUILD="bash build.sh"
+        - CIBW_BEFORE_BUILD="$PYTHON -m pip install Cython; bash build.sh"
         - PYTHON=/c/Python38/python.exe
     - language: python
       arch: arm64
@@ -57,7 +59,7 @@ env:
     - CIBW_TEST_COMMAND="pytest {project}"
 
 install:
-  - $PYTHON -m pip install Cython cibuildwheel
+  - $PYTHON -m pip install cibuildwheel
 
 script:
   - $PYTHON -m cibuildwheel --output-dir wheelhouse
