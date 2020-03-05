@@ -9,12 +9,12 @@ jobs:
       language: python
       env:
         - PYTHON=python3
-        - CIBW_BEFORE_BUILD="$PYTHON -m pip install Cython"
+        - CIBW_BEFORE_BUILD="$PYTHON -m pip install Cython numpy"
     # macos build
     - os: osx
       env:
         - PYTHON=python3
-        - CIBW_BEFORE_BUILD="$PYTHON -m pip install Cython"
+        - CIBW_BEFORE_BUILD="$PYTHON -m pip install Cython numpy"
     # win_amd64 build
     - os: windows
       before_install:
@@ -23,8 +23,8 @@ jobs:
       env:
         - CIBW_BUILD="*-win_amd64"
         - PLATFORM_OPTION="-A x64"
-        - CIBW_BEFORE_BUILD="$PYTHON -m pip install Cython; bash build.sh"
         - PYTHON=/c/Python38/python.exe
+        - CIBW_BEFORE_BUILD="$PYTHON -m pip install Cython numpy; bash build.sh"
     # win32 build
     - os: windows
       before_install:
@@ -32,13 +32,13 @@ jobs:
         - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
       env:
         - CIBW_BUILD="*-win32"
-        - CIBW_BEFORE_BUILD="$PYTHON -m pip install Cython; bash build.sh"
         - PYTHON=/c/Python38/python.exe
+        - CIBW_BEFORE_BUILD="$PYTHON -m pip install Cython numpy; bash build.sh"
     - language: python
       arch: arm64
       install:
       script:
-        - python3 -m pip install -U setuptools pip wheel Cython
+        - python3 -m pip install -U setuptools pip wheel Cython numpy
         - python3 setup.py sdist
         # without --no-cache:
         # [Errno 13] Permission denied: '/home/travis/.cache/pip/wheels/3a'
