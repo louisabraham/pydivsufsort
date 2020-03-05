@@ -75,7 +75,7 @@ setup(
         ]
     },
     ext_modules=cythonize(
-        "pydivsufsort/stringalg.pyx", include_dirs=[numpy.get_include()]
+        "pydivsufsort/stringalg.pyx", include_path=[numpy.get_include()]
     ),  # needed to make the libraries platlib
     python_requires=">=3.6",
     install_requires=["wheel", "numpy"],
