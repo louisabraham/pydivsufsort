@@ -37,14 +37,16 @@ jobs:
       install:
       script:
         - python3 -m pip install -U setuptools pip pytest
+        - python3 -m pip install .
+        - python3 setup.py install
         - python3 setup.py sdist
         - python3 -m pip install dist/*.tar.gz
         - pytest
       after_success:
           - |
             if [[ $TWINE_PASSWORD  ]]; then
-              $PYTHON -m pip install twine
-              $PYTHON -m twine upload --skip-existing dist/*
+              python3 -m pip install twine
+              python3 -m twine upload --skip-existing dist/*
             fi        
 
 env:
