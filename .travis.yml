@@ -38,6 +38,8 @@ jobs:
       script:
         - python3 -m pip install -U setuptools pip wheel
         - python3 setup.py sdist
+        # without --no-cache:
+        # [Errno 13] Permission denied: '/home/travis/.cache/pip/wheels/3a'
         - python3 -m pip install --no-cache dist/*.tar.gz
         - pytest
       after_success:
