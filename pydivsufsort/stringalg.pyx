@@ -1,4 +1,5 @@
 cimport numpy as np
+import numpy as np
 
 ctypedef fused size_t:
     np.int32_t
