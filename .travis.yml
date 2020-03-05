@@ -38,7 +38,7 @@ jobs:
       script:
         - python3 -m pip install -U setuptools pip pytest
         - python3 setup.py sdist
-        - python3 -m pip install sdist
+        - python3 -m pip install dist/*.tar.gz
         - pytest
       after_success:
           - |
