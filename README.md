@@ -9,12 +9,13 @@ includes it in a Python package with bindings.
 
 ## Installation
 
-On Linux and macOS:
+On Linux, macOS and Windows:
+
 ```
 python -m pip install pydivsufsort
 ```
 
-Untested on Windows.
+We provide precompiled wheels for common systems, and a source distribution for Unix systems. Manual compilation on Windows might require some tweaking, please create an issue. 
 
 ## Testing
 
