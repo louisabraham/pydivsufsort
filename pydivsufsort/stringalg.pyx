@@ -1,9 +1,10 @@
 cimport numpy as np
 import numpy as np
 
-ctypedef fused size_t:
+ctypedef fused sa_t:
     np.int32_t
     np.int64_t
+
 
 ctypedef fused string_t:
     np.uint8_t
@@ -15,13 +16,10 @@ ctypedef fused string_t:
     np.int32_t
     np.int64_t
 
-cdef kasai(string_t[:] s, size_t[:] sa ):
-    if not s.flags['C_CONTIGUOUS']:
-        s = np.ascontiguousarray(s)
-    if not sa.flags['C_CONTIGUOUS']:
-        sa = np.ascontiguousarray(sa)
 
-    cdef size_t i, j, n, k
+def _kasai(string_t[::1] s, sa_t[::1] sa ):
+
+    cdef sa_t i, j, n, k
     cdef lcp = np.empty_like(sa) 
     cdef rank = np.empty_like(sa)
 
@@ -32,14 +30,22 @@ cdef kasai(string_t[:] s, size_t[:] sa ):
 
     k = 0
     for i in range(n):
-        if sa[i] == n - 1:
-            k = 0
+        if rank[i] == n - 1:
+            lcp[n-1] = k = 0
             continue
-        j = rank[sa[i] + 1]
+        j = sa[rank[i] + 1]
         while i + k < n and j + k < n and s[i+k] == s[j+k]:
             k += 1
-        lcp[sa[i]] = k
+        lcp[rank[i]] = k
         if k:
             k -= 1
 
     return lcp
+
+def kasai(s, sa):
+    if not s.flags['C_CONTIGUOUS']:
+        s = np.ascontiguousarray(s)
+    if not sa.flags['C_CONTIGUOUS']:
+        sa = np.ascontiguousarray(sa)
+    # cast s as a buffer
+    return _kasai(s, sa)
