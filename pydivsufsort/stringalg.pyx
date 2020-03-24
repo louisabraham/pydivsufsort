@@ -4,6 +4,8 @@ cimport numpy as np
 import numpy as np
 import ctypes
 
+import warning
+
 from .divsufsort import divsufsort 
 
 
@@ -48,7 +50,7 @@ def _kasai(string_t[::1] s not None, sa_t[::1] sa not None):
 
     return lcp
 
-def _kasai_bytes(const char[::1] s not None, sa_t[::1] sa not None):
+def _kasai_bytes(const unsigned char[::1] s not None, sa_t[::1] sa not None):
     """Same as _kasai but with a const first argument.
     Cython does not support const fused types arguments YET
     but it will be fixed in the 0.30 release
