@@ -3,6 +3,8 @@
 
 pydivsufsort/*.c
 
+tempbuild/*
+
 # editor saves
 *~
 
