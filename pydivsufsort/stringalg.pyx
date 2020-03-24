@@ -13,8 +13,7 @@ ctypedef fused sa_t:
     np.int64_t
 
 ctypedef fused string_t:
-    # handled separately in kasai_bytes
-    # np.uint8_t
+    np.uint8_t
     np.uint16_t
     np.uint32_t
     np.uint64_t
