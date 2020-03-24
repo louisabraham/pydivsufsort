@@ -4,7 +4,7 @@ cimport numpy as np
 import numpy as np
 import ctypes
 
-import warning
+import warnings
 
 from .divsufsort import divsufsort 
 
@@ -85,7 +85,7 @@ def kasai(s, sa=None):
         try:
             s = s.encode("ascii")
             if len(s) > 999:
-                warning.warn("converting str argument uses more memory")
+                warnings.warn("converting str argument uses more memory")
         except UnicodeEncodeError:
             raise TypeError("str must only contain ascii chars")
     if sa is None:
