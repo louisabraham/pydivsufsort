@@ -82,6 +82,8 @@ def kasai(s, sa=None):
     if isinstance(s, str):
         try:
             s = s.encode("ascii")
+            if len(s) > 999:
+                warning.warn("converting str argument uses more memory")
         except UnicodeEncodeError:
             raise TypeError("str must only contain ascii chars")
     if sa is None:

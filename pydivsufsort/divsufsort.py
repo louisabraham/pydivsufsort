@@ -72,6 +72,8 @@ def divsufsort(inp):
     elif isinstance(inp, str):
         try:
             inp_p = inp.encode("ascii")
+            if len(inp) > 999:
+                warning.warn("converting str argument uses more memory")
         except UnicodeEncodeError:
             raise TypeError("str must only contain ascii chars")
     else:
