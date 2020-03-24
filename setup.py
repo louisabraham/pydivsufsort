@@ -5,53 +5,29 @@ import platform
 from subprocess import Popen
 from setuptools import setup
 from setuptools import Extension
-
-# from distutils.command.build import build as _build
-# from distutils.command.install import install as _install
-import setuptools.command.build_ext
+from distutils.command.build import build as _build
+from distutils.command.install import install as _install
 from Cython.Build import cythonize
 
 import numpy
 
-# # make the wheel platform specific
-# # https://stackoverflow.com/a/45150383
-# try:
-#     from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+# make the wheel platform specific
+# https://stackoverflow.com/a/45150383
+try:
+    from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 
-#     class bdist_wheel(_bdist_wheel):
-#         def finalize_options(self):
-#             _bdist_wheel.finalize_options(self)
-#             self.root_is_pure = False
-
-
-# except ImportError:
-#     bdist_wheel = None
+    class bdist_wheel(_bdist_wheel):
+        def finalize_options(self):
+            _bdist_wheel.finalize_options(self)
+            self.root_is_pure = False
 
 
-# class build(_build):
-#     def run(self):
-#         if platform.system() == "Windows":
-#             witness = Path(__file__).parent / "pydivsufsort/divsufsort.dll"
-#             assert witness.exists(), "Launch ./build.sh first"
-#         else:
-#             script = Path(__file__).parent / "build.sh"
-#             path = script.absolute().as_posix()
-#             Popen([path], shell=True, executable="/bin/bash").wait()
-#         super().run()
+except ImportError:
+    bdist_wheel = None
 
 
-# idk why this is required for build to execute
-# class install(_install):
-#     def run(self):
-#         super().run()
-
-
-class BuildExt(setuptools.command.build_ext.build_ext):
+class build(_build):
     def run(self):
-        import sys
-
-        print("Executing BuildExt", file=sys.stderr)
-
         if platform.system() == "Windows":
             witness = Path(__file__).parent / "pydivsufsort/divsufsort.dll"
             assert witness.exists(), "Launch ./build.sh first"
@@ -59,6 +35,12 @@ class BuildExt(setuptools.command.build_ext.build_ext):
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
             Popen([path], shell=True, executable="/bin/bash").wait()
+        super().run()
+
+
+# idk why this is required for build to execute
+class install(_install):
+    def run(self):
         super().run()
 
 
@@ -106,5 +88,5 @@ setup(
     install_requires=["wheel", "numpy"],
     tests_require=["pytest"],
     classifiers=[],
-    cmdclass={"build_ext": BuildExt},
+    cmdclass={"build": build, "bdist_wheel": bdist_wheel, "install": install},
 )
