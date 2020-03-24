@@ -1,10 +1,14 @@
+# cython: language_level=3, wraparound=False
+
 cimport numpy as np
 import numpy as np
+
+from .divsufsort import divsufsort 
+
 
 ctypedef fused sa_t:
     np.int32_t
     np.int64_t
-
 
 ctypedef fused string_t:
     np.uint8_t
@@ -17,12 +21,15 @@ ctypedef fused string_t:
     np.int64_t
 
 
-def _kasai(string_t[::1] s, sa_t[::1] sa ):
+def kasai(string_t[::1] s not None, sa_t[::1] sa = None):
 
+    if sa is None:
+        return _kasai(s, divsufsort(s))
+        
     cdef sa_t i, j, n, k
-    cdef lcp = np.empty_like(sa) 
-    cdef rank = np.empty_like(sa)
-
+    cdef np.ndarray[sa_t, ndim=1] lcp = np.empty_like(sa) 
+    cdef np.ndarray[sa_t, ndim=1] rank = np.empty_like(sa)
+        
     n = len(sa)
 
     for i in range(n):
@@ -41,11 +48,3 @@ def _kasai(string_t[::1] s, sa_t[::1] sa ):
             k -= 1
 
     return lcp
-
-def kasai(s, sa):
-    if not s.flags['C_CONTIGUOUS']:
-        s = np.ascontiguousarray(s)
-    if not sa.flags['C_CONTIGUOUS']:
-        sa = np.ascontiguousarray(sa)
-    # cast s as a buffer
-    return _kasai(s, sa)
