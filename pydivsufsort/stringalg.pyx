@@ -79,6 +79,11 @@ def _kasai_bytes(const char[::1] s not None, sa_t[::1] sa not None):
     return lcp
 
 def kasai(s, sa=None):
+    if isinstance(s, str):
+        try:
+            s = s.encode("ascii")
+        except UnicodeEncodeError:
+            raise TypeError("str must only contain ascii chars")
     if sa is None:
         sa = divsufsort(s)
     if isinstance(s, bytes):

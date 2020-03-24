@@ -17,7 +17,11 @@ def cast_to_array(inp):
     return out
 
 
-CASTS = [bytes, bytearray, cast_to_array]
+def cast_to_str(inp):
+    return bytes(inp).decode()
+
+
+CASTS = [bytes, bytearray, cast_to_array, cast_to_str]
 
 
 def assert_correct(inp):
@@ -27,6 +31,10 @@ def assert_correct(inp):
 def randint_type(size, dtype):
     iinfo = np.iinfo(dtype)
     return np.random.randint(iinfo.min, iinfo.max, size=size, dtype=dtype)
+
+
+def randint_ascii(size):
+    return np.random.randint(0, 128, size=size, dtype="uint8")
 
 
 def random_cast(inp):
@@ -47,7 +55,7 @@ def random_test(repetitions, size, dtype):
 
 
 def test_containers():
-    inp = randint_type(10, np.uint8)
+    inp = randint_ascii(10)
     for cast in CASTS:
         assert_correct(cast(inp))
 

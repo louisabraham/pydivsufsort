@@ -69,6 +69,11 @@ def divsufsort(inp):
         inp_p = _pointer_frombuffer(inp)
     elif isinstance(inp, bytes):
         inp_p = inp
+    elif isinstance(inp, str):
+        try:
+            inp_p = inp.encode("ascii")
+        except UnicodeEncodeError:
+            raise TypeError("str must only contain ascii chars")
     else:
         warnings.warn("input type not recognized, handled as a buffer of char")
         inp_p = _pointer_frombuffer(inp)
