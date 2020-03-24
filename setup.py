@@ -44,12 +44,6 @@ class install(_install):
         super().run()
 
 
-# from https://github.com/IntelRealSense/librealsense/blob/master/wrappers/python/setup.py
-class EmptyListWithLength(list):
-    def __len__(self):
-        return 1
-
-
 def read(fname):
     return (Path(__file__).parent / fname).open().read()
 
