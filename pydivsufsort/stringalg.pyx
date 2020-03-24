@@ -24,7 +24,7 @@ ctypedef fused string_t:
 def kasai(string_t[::1] s not None, sa_t[::1] sa = None):
 
     if sa is None:
-        return _kasai(s, divsufsort(s))
+        return kasai(s, divsufsort(s))
         
     cdef sa_t i, j, n, k
     cdef np.ndarray[sa_t, ndim=1] lcp = np.empty_like(sa) 
