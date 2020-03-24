@@ -2,10 +2,13 @@ import array
 from functools import partial
 import random
 
+import numpy as np
+
 from pydivsufsort import divsufsort
 from pydivsufsort.divsufsort import _SUPPORTED_DTYPES, _minimize_dtype
+from pydivsufsort import kasai
+
 from reference import suffix_array
-import numpy as np
 
 
 def cast_to_array(inp):
@@ -65,3 +68,11 @@ def test_minimize_dtype():
         inp = randint_type(100, dtype)
         inp = random_cast(inp)
         assert _minimize_dtype(inp).dtype.itemsize == np.dtype(dtype).itemsize, inp
+
+
+def test_kasai():
+    inp = np.array(list(b"banana"), dtype="uint8")
+    out = np.array([1, 3, 0, 0, 2, 0])
+    assert (kasai(inp) == out).all()
+    for cast in CASTS:
+        assert (kasai(cast(inp)) == out).all()
