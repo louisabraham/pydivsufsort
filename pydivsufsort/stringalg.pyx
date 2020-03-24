@@ -52,6 +52,10 @@ def _kasai(string_t[::1] s not None, sa_t[::1] sa not None):
 def kasai(s, sa=None):
     if isinstance(s, bytes):
         # bad, makes a copy
+        # fixing would probably require using ctypes
+        # like for divsufsort
+        # but it would prevent the use of the buffer interface
+        warnings.warn("Passing bytes to kasai() forces memory copy")
         s = bytearray(s)
     if sa is None:
         with warnings.catch_warnings():
