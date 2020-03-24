@@ -7,6 +7,12 @@ Status](https://travis-ci.org/louisabraham/pydivsufsort.svg?branch=master)](http
 `pydivsufsort` prebuilds `libdivsufsort` as a shared library and
 includes it in a Python package with bindings.
 
+**Features**:
+
+- bindings to `divsufsort` that return numpy arrays
+- handle almost any integer data type (e.g. `int64`) and not only `char`
+- additional string algorithms
+
 ## Installation
 
 On Linux, macOS and Windows:
@@ -15,7 +21,19 @@ On Linux, macOS and Windows:
 python -m pip install pydivsufsort
 ```
 
-We provide precompiled wheels for common systems, and a source distribution for Unix systems. Manual compilation on Windows might require some tweaking, please create an issue. 
+We provide precompiled wheels for common systems, and a source distribution for Unix systems. Manual compilation on Windows might require some tweaking, please create an issue.
+
+## Usage
+
+```python
+from pydivsufsort import divsufsort, kasai
+
+print(divsufsort(b"abcd"))
+
+inp = np.array([1, 4, 2, 4, 5, 2, 2])
+sa = divsufsort(inp)
+print(kasai(inp, sa))
+```
 
 ## Testing
 
