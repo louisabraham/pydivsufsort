@@ -34,4 +34,4 @@ The original `libdivsufsort` only supports char as the base type. `pydivsufsort`
 ## Acknowledgements
 
 - [Yuta Mori](https://github.com/y-256) for writing [libdivsufsort](https://github.com/y-256/libdivsufsort)
-- [Sean Law](https://github.com/seanlaw) for initiating this project and contributing
+- [Sean Law](http://seanlaw.github.io/) for initiating this project and contributing
