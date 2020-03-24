@@ -48,6 +48,10 @@ import numpy
 
 class BuildExt(setuptools.command.build_ext.build_ext):
     def run(self):
+        import sys
+
+        print("Executing BuildExt", file=sys.stderr)
+
         if platform.system() == "Windows":
             witness = Path(__file__).parent / "pydivsufsort/divsufsort.dll"
             assert witness.exists(), "Launch ./build.sh first"
