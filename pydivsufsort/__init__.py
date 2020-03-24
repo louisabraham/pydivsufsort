@@ -1,2 +1,2 @@
 from .divsufsort import divsufsort
-from . import stringalg
+from .stringalg import kasai

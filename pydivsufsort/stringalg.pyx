@@ -2,9 +2,11 @@
 
 cimport numpy as np
 import numpy as np
+import ctypes
 
 from .divsufsort import divsufsort 
 
+import warnings
 
 ctypedef fused sa_t:
     np.int32_t
@@ -21,10 +23,8 @@ ctypedef fused string_t:
     np.int64_t
 
 
-def kasai(string_t[::1] s not None, sa_t[::1] sa = None):
+def _kasai(string_t[::1] s not None, sa_t[::1] sa not None):
 
-    if sa is None:
-        return kasai(s, divsufsort(s))
         
     cdef sa_t i, j, n, k
     cdef np.ndarray[sa_t, ndim=1] lcp = np.empty_like(sa) 
@@ -48,3 +48,14 @@ def kasai(string_t[::1] s not None, sa_t[::1] sa = None):
             k -= 1
 
     return lcp
+
+def kasai(s, sa=None):
+    if isinstance(s, bytes):
+        # bad, makes a copy
+        s = bytearray(s)
+    if sa is None:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            sa = divsufsort(s)
+
+    return _kasai(s, sa)
