@@ -6,7 +6,6 @@ import ctypes
 
 from .divsufsort import divsufsort 
 
-import warnings
 
 ctypedef fused sa_t:
     np.int32_t
