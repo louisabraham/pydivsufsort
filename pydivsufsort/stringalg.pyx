@@ -1,8 +1,7 @@
-# cython: language_level=3, wraparound=False
+# cython: language_level=3, wraparound=False, boundscheck=False
 
 cimport numpy as np
 import numpy as np
-import ctypes
 
 import warnings
 
