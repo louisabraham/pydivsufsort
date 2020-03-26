@@ -25,25 +25,41 @@ We provide precompiled wheels for common systems, and a source distribution for 
 
 ## Usage
 
+### Using String Inputs
+
 ```python
 import numpy as np
 from pydivsufsort import divsufsort, kasai
 
-# Using string inputs
 string_inp = "banana$"
 string_suffix_array = divsufsort(string_inp)
 string_lcp_array = kasai(string_inp, string_suffix_array)
 print(string_suffix_array, string_lcp_array)
 # [6 5 3 1 0 4 2] [0 1 3 0 0 2 0]
+```
 
-# Using integer inputs by converting the string input to integers first
+### Using Integer Inputs
+
+```python
+import numpy as np
+from pydivsufsort import divsufsort, kasai
+
+string_inp = "banana$"
+
+# Convert the string input to integers first
 int_inp = np.unique(np.array(list(string_inp)), return_inverse=True)[1]
 int_suffix_array = divsufsort(int_inp)
 int_lcp_array = kasai(int_inp, int_suffix_array)
 print(int_suffix_array, int_lcp_array)
 # [6 5 3 1 0 4 2] [0 1 3 0 0 2 0]
+```
 
-# Using multiple sentinel characters witin a string
+### Using Multiple Sentinel Characters Witin A String
+
+```python
+import numpy as np
+from pydivsufsort import divsufsort, kasai
+
 sentinel_inp = "a$banana#and@a*bandana+"
 sentinel_suffix_array = divsufsort(sentinel_inp)
 sentinel_lcp_array = kasai(sentinel_inp, sentinel_suffix_array)
