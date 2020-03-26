@@ -26,13 +26,20 @@ We provide precompiled wheels for common systems, and a source distribution for 
 ## Usage
 
 ```python
+import numpy as np
 from pydivsufsort import divsufsort, kasai
 
-print(divsufsort(b"abcd"))
+# Using string inputs
+string_inp = "banana$"
+suffix_array = divsufsort(string_inp)
+lcp_array = kasai(string_inp, suffix_array)
+print(suffix_array, lcp_array)
 
-inp = np.array([1, 4, 2, 4, 5, 2, 2])
-sa = divsufsort(inp)
-print(kasai(inp, sa))
+# Using integer inputs by converting the string input to integers first
+int_inp = np.unique(np.array(list(string_inp)), return_inverse=True)[1]
+suffix_array = divsufsort(int_inp)
+lcp_array = kasai(int_inp, suffix_array)
+print(suffix_array, lcp_array)
 ```
 
 ## Testing
