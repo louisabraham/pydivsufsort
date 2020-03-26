@@ -31,15 +31,15 @@ from pydivsufsort import divsufsort, kasai
 
 # Using string inputs
 string_inp = "banana$"
-suffix_array = divsufsort(string_inp)
-lcp_array = kasai(string_inp, suffix_array)
-print(suffix_array, lcp_array)
+string_suffix_array = divsufsort(string_inp)
+string_lcp_array = kasai(string_inp, string_suffix_array)
+print(string_suffix_array, string_lcp_array)
 
 # Using integer inputs by converting the string input to integers first
 int_inp = np.unique(np.array(list(string_inp)), return_inverse=True)[1]
-suffix_array = divsufsort(int_inp)
-lcp_array = kasai(int_inp, suffix_array)
-print(suffix_array, lcp_array)
+int_suffix_array = divsufsort(int_inp)
+int_lcp_array = kasai(int_inp, int_suffix_array)
+print(int_suffix_array, int_lcp_array)
 ```
 
 ## Testing
