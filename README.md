@@ -34,12 +34,21 @@ string_inp = "banana$"
 string_suffix_array = divsufsort(string_inp)
 string_lcp_array = kasai(string_inp, string_suffix_array)
 print(string_suffix_array, string_lcp_array)
+# [6 5 3 1 0 4 2] [0 1 3 0 0 2 0]
 
 # Using integer inputs by converting the string input to integers first
 int_inp = np.unique(np.array(list(string_inp)), return_inverse=True)[1]
 int_suffix_array = divsufsort(int_inp)
 int_lcp_array = kasai(int_inp, int_suffix_array)
 print(int_suffix_array, int_lcp_array)
+# [6 5 3 1 0 4 2] [0 1 3 0 0 2 0]
+
+# Using multiple sentinel characters witin a string
+sentinel_inp = "a$banana#and@a*bandana+"
+sentinel_suffix_array = divsufsort(sentinel_inp)
+sentinel_lcp_array = kasai(sentinel_inp, sentinel_suffix_array)
+print(sentinel_suffix_array, sentinel_lcp_array)
+# [ 8  1 14 22 12  7  0 13 21  5 19  3  9 16  2 15 11 18  6 20  4 10 17] [0 0 0 0 0 1 1 1 1 3 3 2 3 0 3 0 1 0 2 2 1 2 0]
 ```
 
 ## Testing
