@@ -51,6 +51,7 @@ _SUPPORTED_DTYPES = {
 def divsufsort(inp):
     if isinstance(inp, np.ndarray):
         if inp.dtype == np.uint8:
+            # https://stackoverflow.com/q/60848009/5133167
             if not inp.flags["C_CONTIGUOUS"]:
                 # Make a contiguous copy of the numpy array.
                 inp = np.ascontiguousarray(inp)
