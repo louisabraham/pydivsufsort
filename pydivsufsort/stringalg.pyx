@@ -80,7 +80,6 @@ def _kasai_bytes(const unsigned char[::1] s not None, sa_t[::1] sa not None):
     return lcp
 
 def kasai(s, sa=None):
-    # TODO: handle non contiguous / benchmark without [::1]
     if isinstance(s, str):
         try:
             s = s.encode("ascii")
@@ -88,6 +87,12 @@ def kasai(s, sa=None):
                 warnings.warn("converting str argument uses more memory")
         except UnicodeEncodeError:
             raise TypeError("str must only contain ascii chars")
+    if isinstance(s, np.ndarray):
+        # in my tests, converting to contiguous and using [::1]
+        # gives slightly better performance than using [:]
+        if not s.flags["C_CONTIGUOUS"]:
+            # Make a contiguous copy of the numpy array.
+            s = np.ascontiguousarray(s)
     if sa is None:
         sa = divsufsort(s)
     if isinstance(s, bytes):
