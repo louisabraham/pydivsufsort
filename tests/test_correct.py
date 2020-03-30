@@ -25,12 +25,15 @@ CASTS = [bytes, bytearray, cast_to_array, cast_to_str]
 
 
 def assert_correct(inp):
-    assert (divsufsort(inp) == suffix_array(inp)).all(), inp
+    sa = suffix_array(inp)
+    assert (divsufsort(inp) == sa).all(), inp
+    kasai(inp)
+    kasai(inp, sa)
 
 
 def randint_type(size, dtype):
     iinfo = np.iinfo(dtype)
-    return np.random.randint(iinfo.min, iinfo.max, size=size, dtype=dtype)
+    return np.random.randint(iinfo.min, iinfo.max + 1, size=size, dtype=dtype)
 
 
 def randint_ascii(size):
@@ -84,3 +87,9 @@ def test_kasai():
     assert (kasai(inp) == out).all()
     for cast in CASTS:
         assert (kasai(cast(inp)) == out).all()
+
+
+def test_non_contiguous():
+    for dtype in _SUPPORTED_DTYPES:
+        inp = randint_type(100, dtype)[::2]
+        assert_correct(inp)
