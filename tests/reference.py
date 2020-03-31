@@ -47,3 +47,13 @@ def suffix_array(s):
     else:
         dtype = np.int64
     return np.array(_inverse_array(line), dtype=dtype)
+
+
+def longest_common_prefix(s, i, j):
+    """naive longest prefix of positions i and j
+    """
+    n = len(s)
+    k = 0
+    while max(i, j) + k < n and s[i + k] == s[j + k]:
+        k += 1
+    return k
