@@ -24,7 +24,7 @@ def _as_unsigned(inp: np.ndarray):
     dtype = inp.dtype
     if dtype not in _SIGNED_TO_UNSIGNED:
         return inp
-    lastbit = np.iinfo(inp.dtype).max + 1
+    lastbit = np.iinfo(dtype).max + 1
     return inp.astype(_SIGNED_TO_UNSIGNED[dtype]) ^ lastbit
 
 
