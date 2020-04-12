@@ -157,3 +157,12 @@ def test_sa_search():
 
 def test_levenshtein():
     assert levenshtein("kitten", "sitting") == 3
+
+
+def test_mfs():
+    s = "ababababa"
+    sa = divsufsort(s)
+    lcp = kasai(s, sa)
+    pos, cnt = most_frequent_substrings(lcp, 3, limit=2)
+    assert (sa[pos] == [6, 5]).all()
+    assert (cnt == [4, 3]).all()
