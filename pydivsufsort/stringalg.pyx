@@ -1,4 +1,5 @@
 # cython: language_level=3, wraparound=False, boundscheck=False
+# distutils: language=c++
 
 cimport numpy as np
 import numpy as np
@@ -21,7 +22,6 @@ ctypedef fused string_t:
     np.int16_t
     np.int32_t
     np.int64_t
-
 
 def handle_input(s):
     if isinstance(s, np.ndarray):
@@ -202,3 +202,77 @@ def levenshtein(a, b):
         # tofix
         b = bytearray(b)
     return _levenshtein(a, b)
+
+from libcpp.pair cimport pair
+from libcpp.vector cimport vector
+from libcpp.algorithm cimport sort
+
+# TODO: in Cython 0.30 reverse can be imported from libcpp.algorithm
+cdef extern from "<algorithm>" namespace "std" nogil:
+    void reverse[Iter](Iter first, Iter last) except +
+
+
+def most_frequent_substrings(
+    np.ndarray[sa_t, ndim=1] lcp not None,
+    sa_t length,
+    sa_t limit = 0,
+    sa_t minimum_count = 1
+    ):
+    """
+    Parameters
+    ----------
+
+    lcp : np.ndarray
+        LCP array
+    length : int
+        length of the substrings to compare
+    limit : int (default 0)
+        number of substrings to extract, 0 for all of them
+    minimum_count : int (default 1)
+        ignore the substrings that occur less than `minimum_count` times
+    
+
+    Returns
+    -------
+    positions : np.ndarray
+        position in the suffix array
+    counts : np.ndarray
+        number of occurrences, decreasing
+    """
+    # TODO: test
+    # TODO: clean <https://stackoverflow.com/q/61176636/5133167>
+
+    cdef sa_t n, i, cur, cur_count, last    
+    cdef vector[pair[sa_t, sa_t]] count
+    
+    if minimum_count < 1:
+        minimum_count = 1
+
+    n = len(lcp)
+    cur = 0
+    cur_count = 1
+    for i in range(n-1):
+        if lcp[i] >= length:
+            cur_count += 1
+        else:
+            if cur_count >= minimum_count:
+                count.push_back(pair[sa_t, sa_t](cur_count, cur))
+            cur = i + 1
+            cur_count = 1
+    if cur_count >= minimum_count:
+        count.push_back(pair[sa_t, sa_t](cur_count, cur))
+
+    sort(count.begin(), count.end())
+    reverse(count.begin(), count.end())
+    if limit and limit < count.size():
+        count.resize(limit)
+    
+    n = count.size()
+    cdef np.ndarray[sa_t, ndim=1] pos = np.empty(n, dtype=lcp.dtype) 
+    cdef np.ndarray[sa_t, ndim=1] cnt = np.empty(n, dtype=lcp.dtype) 
+
+    for i in range(n):
+        pos[i] = count[i].second
+        cnt[i] = count[i].first
+
+    return pos, cnt
