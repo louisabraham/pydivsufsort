@@ -4,10 +4,18 @@ import random
 
 import numpy as np
 
-from pydivsufsort import divsufsort, kasai, lcp_segtree, lcp_query
+from pydivsufsort import (
+    divsufsort,
+    kasai,
+    lcp_segtree,
+    lcp_query,
+    bw_transform,
+    inverse_bw_transform,
+    sa_search,
+)
 from pydivsufsort.divsufsort import _SUPPORTED_DTYPES, _minimize_dtype
 
-from reference import suffix_array, longest_common_prefix
+from reference import suffix_array, longest_common_prefix, BWT, iBWT
 
 
 def cast_to_array(inp):
@@ -20,12 +28,21 @@ def cast_to_str(inp):
     return bytes(inp).decode()
 
 
+def cast_to_array(inp):
+    """cast back any type to an array
+    """
+    if isinstance(inp, str):
+        inp = inp.encode("ascii")
+    return np.array(list(inp))
+
+
 CASTS = [bytes, bytearray, cast_to_array, cast_to_str]
 
 
 def assert_correct(inp, queries=None):
     sa = suffix_array(inp)
     assert (divsufsort(inp) == sa).all(), inp
+
     segtree = lcp_segtree(inp)
     if queries is None:
         n = len(inp)
@@ -33,6 +50,16 @@ def assert_correct(inp, queries=None):
     lcp_opt = lcp_query(*segtree, queries)
     lcp_naive = [longest_common_prefix(inp, i, j) for i, j in queries]
     assert (lcp_opt == lcp_naive).all(), (inp, lcp_naive, lcp_opt)
+
+    if not (isinstance(inp, np.ndarray) and inp.dtype != np.uint8):
+        bwt_opt = bw_transform(inp)
+        bwt_naive = BWT(inp)
+        assert bwt_opt[0] == bwt_naive[0]
+        assert (bwt_opt[1] == bwt_naive[1]).all()
+        tr_opt = inverse_bw_transform(*bwt_opt)
+        tr_naive = iBWT(*bwt_naive)
+        assert (tr_opt == cast_to_array(inp)).all(), inp
+        assert (tr_opt == tr_naive).all(), inp
 
 
 def randint_type(size, dtype):
@@ -105,3 +132,23 @@ def test_queries():
         inp = np.random.randint(3, size=n)
         queries = np.random.randint(n, size=(q, 2))
         assert_correct(inp, queries)
+
+
+def test_sa_search():
+    n = 1_000
+    for _ in range(10):
+        inp = np.random.randint(3, size=n, dtype=np.uint8)
+        print(inp.dtype)
+        sa = divsufsort(inp)
+        isa = np.argsort(sa)
+        for m in list(range(1, 5)) * 10:
+            query = np.random.randint(3, size=m, dtype=np.uint8)
+            print(inp.dtype)
+            matches = [i for i in range(n - m + 1) if (query == inp[i : i + m]).all()]
+            count = len(matches)
+            if count:
+                left = isa[matches].min()
+            else:
+                left = None
+            assert (count, left) == sa_search(inp, sa, query)
+            assert (sorted(isa[matches]) == np.arange(left, left + count)).all()

@@ -57,3 +57,37 @@ def longest_common_prefix(s, i, j):
     while max(i, j) + k < n and s[i + k] == s[j + k]:
         k += 1
     return k
+
+
+def BWT(s, sa=None):
+    if isinstance(s, str):
+        s = s.encode("ascii")
+    if sa is None:
+        sa = suffix_array(s)
+    pos = _inverse_array(sa)
+    sa, pos = pos, sa
+    ans = [s[-1]]
+    for i in range(len(s)):
+        if pos[i] > 0:
+            ans.append(s[pos[i] - 1])
+        else:
+            idx = i + 1
+    return idx, ans
+
+
+def iBWT(idx, b):
+    n = len(b)
+    last = list(zip(b, range(n)))
+    ilast = {}
+    for i, e in enumerate(last):
+        ilast[e] = i + (i >= idx)
+    first = sorted(last)
+    ans = []
+    c = first[idx - 1]
+    while len(ans) < n:
+        ans.append(c[0])
+        c = first[ilast[c] - 1]
+    return ans
+
+
+print(iBWT(*BWT("banana")))

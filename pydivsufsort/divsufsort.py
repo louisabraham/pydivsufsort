@@ -1,3 +1,7 @@
+"""
+Interface to the functions of libdivsufsort
+"""
+
 import ctypes
 from array import array
 import warnings
@@ -18,7 +22,7 @@ _SIGNED_TO_UNSIGNED = {
 
 
 def _as_unsigned(inp: np.ndarray):
-    """Casts to the corresponding unsigned dtype
+    """_casts to the corresponding unsigned dtype
     and preserves the order of the elements
     """
     dtype = inp.dtype
@@ -48,40 +52,54 @@ _SUPPORTED_DTYPES = {
 }
 
 
+def _get_bytes_pointer(inp):
+    """Returns pointer to bytes-like input
+    """
+    if isinstance(inp, np.ndarray):
+        assert inp.dtype == np.uint8
+        # https://stackoverflow.com/q/60848009/5133167
+        if not inp.flags["C_CONTIGUOUS"]:
+            # Make a contiguous copy of the numpy array.
+            inp = np.ascontiguousarray(inp)
+        return ctypes.pointer(np.ctypeslib.as_ctypes(inp))
+    elif isinstance(inp, array):
+        assert inp.typecode == "B"
+        return _pointer_frombuffer(inp)
+    elif isinstance(inp, bytearray):
+        return _pointer_frombuffer(inp)
+    elif isinstance(inp, bytes):
+        return inp
+    elif isinstance(inp, str):
+        try:
+            ans = inp.encode("ascii")
+            if len(inp) > 999:
+                warnings.warn("converting str argument uses more memory")
+            return ans
+        except UnicodeEncodeError:
+            raise TypeError("str must only contain ascii chars")
+    else:
+        warnings.warn("input type not recognized, handled as a buffer of char")
+        return _pointer_frombuffer(inp)
+
+
+def _cast(inp):
+    return _minimize_dtype(_as_unsigned(inp))
+
+
 def divsufsort(inp):
     if isinstance(inp, np.ndarray):
         if inp.dtype == np.uint8:
-            # https://stackoverflow.com/q/60848009/5133167
-            if not inp.flags["C_CONTIGUOUS"]:
-                # Make a contiguous copy of the numpy array.
-                inp = np.ascontiguousarray(inp)
-            inp_p = ctypes.pointer(np.ctypeslib.as_ctypes(inp))
+            pass
         elif inp.dtype in _SUPPORTED_DTYPES:
-            inp = _minimize_dtype(_as_unsigned(inp))
+            inp = _cast(inp)
             dtype = inp.dtype
             out = divsufsort(inp.view("uint8"))
             return out[out % dtype.itemsize == 0] // dtype.itemsize
         else:
             raise TypeError(inp.dtype)
-    elif isinstance(inp, array):
-        assert inp.typecode == "B"
-        inp_p = _pointer_frombuffer(inp)
-    elif isinstance(inp, bytearray):
-        inp_p = _pointer_frombuffer(inp)
-    elif isinstance(inp, bytes):
-        inp_p = inp
-    elif isinstance(inp, str):
-        try:
-            inp_p = inp.encode("ascii")
-            if len(inp) > 999:
-                warnings.warn("converting str argument uses more memory")
-        except UnicodeEncodeError:
-            raise TypeError("str must only contain ascii chars")
-    else:
-        warnings.warn("input type not recognized, handled as a buffer of char")
-        inp_p = _pointer_frombuffer(inp)
 
     n = len(inp)
+    inp_p = _get_bytes_pointer(inp)
     if n <= np.iinfo(np.int32).max:
         out = (ctypes.c_int32 * n)()
         out_p = ctypes.byref(out)
@@ -92,6 +110,104 @@ def divsufsort(inp):
         retval = libdivsufsort64.divsufsort64(inp_p, out_p, ctypes.c_int64(n))
 
     if retval:
-        raise Exception("Couldn't create suffix array", retval)
+        raise Exception("libdivsufsort error", retval)
 
     return np.ctypeslib.as_array(out)
+
+
+DTYPE_NOT_SUPPORTED_MSG = (
+    "This function only supports inputs that can be converted to uint8. "
+    "Please raise an issue on <https://github.com/louisabraham/pydivsufsort/issues>"
+)
+
+
+def bw_transform(inp, sa=None):
+    # TODO: inplace computation
+    if isinstance(inp, np.ndarray):
+        if inp.dtype == np.uint8:
+            pass
+        if inp.dtype in _SUPPORTED_DTYPES:
+            inp = _cast(inp)
+            dtype = inp.dtype
+            if dtype != np.uint8:
+                raise TypeError(DTYPE_NOT_SUPPORTED_MSG)
+
+    if sa is None:
+        sa_p = None
+    else:
+        sa_p = ctypes.pointer(np.ctypeslib.as_ctypes(sa))
+
+    n = len(inp)
+    inp_p = _get_bytes_pointer(inp)
+
+    out = (ctypes.c_uint8 * n)()
+    out_p = ctypes.byref(out)
+    if sa is not None and sa.dtype == np.int32 or n <= np.iinfo(np.int32).max:
+        idx = ctypes.c_int32()
+        idx_p = ctypes.byref(idx)
+        retval = libdivsufsort.bw_transform(
+            inp_p, out_p, sa_p, ctypes.c_int32(n), idx_p
+        )
+    else:
+        idx = ctypes.c_int64()
+        idx_p = ctypes.byref(idx)
+        retval = libdivsufsort64.bw_transform64(
+            inp_p, out_p, sa_p, ctypes.c_int64(n), idx_p
+        )
+
+    if retval:
+        raise Exception("libdivsufsort error", retval)
+
+    return idx.value, np.ctypeslib.as_array(out)
+
+
+def inverse_bw_transform(idx, bwt):
+    # TODO: inplace computation
+    n = len(bwt)
+    bwt_p = _get_bytes_pointer(bwt)
+
+    out = (ctypes.c_uint8 * n)()
+    out_p = ctypes.byref(out)
+
+    if n <= np.iinfo(np.int32).max:
+        retval = libdivsufsort.inverse_bw_transform(
+            bwt_p, out_p, None, ctypes.c_int32(n), ctypes.c_int32(idx)
+        )
+    else:
+        retval = libdivsufsort64.inverse_bw_transform64(
+            bwt_p, out_p, None, ctypes.c_int64(n), ctypes.c_int64(idx)
+        )
+
+    if retval:
+        raise Exception("libdivsufsort error", retval)
+
+    return np.ctypeslib.as_array(out)
+
+
+def sa_search(inp, sa, pattern):
+    n = len(inp)
+    m = len(pattern)
+
+    inp_p = _get_bytes_pointer(inp)
+    sa_p = ctypes.pointer(np.ctypeslib.as_ctypes(sa))
+    pat_p = _get_bytes_pointer(pattern)
+
+    if sa.dtype == np.int32:
+        n = ctypes.c_int32(n)
+        m = ctypes.c_int32(m)
+        left = ctypes.c_int32()
+        left_p = ctypes.byref(left)
+        retval = libdivsufsort.sa_search(inp_p, n, pat_p, m, sa_p, n, left_p)
+    else:
+        n = ctypes.c_int64(n)
+        m = ctypes.c_int64(m)
+        left = ctypes.c_int64()
+        left_p = ctypes.byref(left)
+        retval = libdivsufsort64.sa_search64(inp_p, n, pat_p, m, sa_p, n, left_p)
+
+    if retval < 0:
+        raise Exception("libdivsufsort error", retval)
+
+    count = retval
+
+    return count, left.value if count else None
