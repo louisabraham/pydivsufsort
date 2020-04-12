@@ -13,6 +13,7 @@ from pydivsufsort import (
     inverse_bw_transform,
     sa_search,
     levenshtein,
+    most_frequent_substrings,
 )
 from pydivsufsort.divsufsort import _SUPPORTED_DTYPES, _minimize_dtype
 
