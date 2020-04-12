@@ -53,7 +53,7 @@ extensions = [
         "pydivsufsort.stringalg",
         ["pydivsufsort/stringalg.pyx"],
         include_dirs=[numpy.get_include()],
-        language="c++",
+        # language="c++",
     )
 ]
 
