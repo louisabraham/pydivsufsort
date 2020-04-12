@@ -2,6 +2,7 @@
 *.dll
 
 pydivsufsort/*.c
+pydivsufsort/*.cpp
 
 tempbuild/*
 
