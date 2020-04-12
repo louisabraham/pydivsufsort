@@ -67,7 +67,8 @@ def _kasai(string_t[::1] s not None, sa_t[::1] sa not None):
 
 def _kasai_bytes(const unsigned char[::1] s not None, sa_t[::1] sa not None):
     """Same as _kasai but with a const first argument.
-    Cython does not support const fused types arguments YET
+    
+    TODO: Cython does not support const fused types arguments YET
     but it will be fixed in the 0.30 release
     <https://github.com/pandas-dev/pandas/issues/31710>
     """
@@ -175,3 +176,29 @@ def lcp_query(
             r >>= 1 
         ans[i] = res
     return ans
+
+def _levenshtein(string_t[::1] a not None, string_t[::1] b not None):
+    cdef unsigned long long n, m, i, j, d
+    n = len(a)
+    m = len(b)
+    cdef np.ndarray[np.uint64_t, ndim=2] temp = np.empty((n+1, m+1), dtype=np.uint64)
+    for i in range(n):
+        temp[i][0] = i
+    for j in range(m):
+        temp[0][j] = j
+    for i in range(n):
+        for j in range(m):
+            temp[i+1][j+1] = min(temp[i][j+1] + 1, temp[i+1][j] + 1, temp[i][j] + (a[i] != b[j]))
+    return temp[n][m]
+
+
+def levenshtein(a, b):
+    a = handle_input(a)
+    b = handle_input(b)
+    if isinstance(a, bytes):
+        # tofix
+        a = bytearray(a)
+    if isinstance(b, bytes):
+        # tofix
+        b = bytearray(b)
+    return _levenshtein(a, b)

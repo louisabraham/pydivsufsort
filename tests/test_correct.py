@@ -12,6 +12,7 @@ from pydivsufsort import (
     bw_transform,
     inverse_bw_transform,
     sa_search,
+    levenshtein,
 )
 from pydivsufsort.divsufsort import _SUPPORTED_DTYPES, _minimize_dtype
 
@@ -152,3 +153,7 @@ def test_sa_search():
                 left = None
             assert (count, left) == sa_search(inp, sa, query)
             assert (sorted(isa[matches]) == np.arange(left, left + count)).all()
+
+
+def test_levenshtein():
+    assert levenshtein("kitten", "sitting") == 3
