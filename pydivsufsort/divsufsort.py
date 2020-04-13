@@ -116,7 +116,7 @@ def divsufsort(inp):
 
 
 DTYPE_NOT_SUPPORTED_MSG = (
-    "This function only supports inputs that can be converted to uint8. "
+    "This function only supports inputs that can be converted to uint8.\n"
     "Please raise an issue on <https://github.com/louisabraham/pydivsufsort/issues>"
 )
 
@@ -190,6 +190,8 @@ def sa_search(inp, sa, pattern):
 
     inp_p = _get_bytes_pointer(inp)
     sa_p = ctypes.pointer(np.ctypeslib.as_ctypes(sa))
+    if isinstance(pattern, np.ndarray):
+        pattern = _cast(pattern)
     pat_p = _get_bytes_pointer(pattern)
 
     if sa.dtype == np.int32:
