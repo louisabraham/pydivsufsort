@@ -6,3 +6,4 @@ from .stringalg import (
     levenshtein,
     most_frequent_substrings,
 )
+from .wonderstring import WonderString
