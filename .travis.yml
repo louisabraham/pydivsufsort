@@ -45,6 +45,7 @@ jobs:
         - flake8
         - python3 setup.py sdist
         - python3 -m pip install --no-cache dist/*.tar.gz
+        - rm -rf pydivsufsort
         - pytest
         - python3 -c "import pydivsufsort; print(pydivsufsort)"
         - coverage run -m pytest tests
