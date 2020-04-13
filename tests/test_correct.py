@@ -30,7 +30,7 @@ def cast_to_str(inp):
     return bytes(inp).decode()
 
 
-def cast_to_array(inp):
+def cast_to_np_array(inp):
     """cast back any type to an array
     """
     if isinstance(inp, str):
@@ -60,7 +60,7 @@ def assert_correct(inp, queries=None):
         assert (bwt_opt[1] == bwt_naive[1]).all()
         tr_opt = inverse_bw_transform(*bwt_opt)
         tr_naive = iBWT(*bwt_naive)
-        assert (tr_opt == cast_to_array(inp)).all(), inp
+        assert (tr_opt == cast_to_np_array(inp)).all(), inp
         assert (tr_opt == tr_naive).all(), inp
 
 
