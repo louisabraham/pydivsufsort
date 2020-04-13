@@ -34,7 +34,7 @@ class WonderString:
             if self.string.dtype == np.uint8:
                 self._bytes = self.string
             else:
-                self._bytes = inp.view("uint8")
+                self._bytes = self.string.view("uint8")
         return self._bytes
 
     @property
@@ -59,7 +59,9 @@ class WonderString:
     def search(self, pattern, return_positions=False):
         if self.itemsize != 1:
             raise NotImplementedError(
-                "Not supported for non byte strings.\nPlease raise an issue on <https://github.com/louisabraham/pydivsufsort/issues>"
+                "Not supported for non byte strings.\n"
+                "Please raise an issue on "
+                "<https://github.com/louisabraham/pydivsufsort/issues>"
             )
 
         ans = SearchResult(*sa_search(self.string, self.suffix_array, pattern))
@@ -103,7 +105,7 @@ class WonderString:
             number of substrings to extract, 0 for all of them
         minimum_count : int (default 1)
             ignore the substrings that occur less than `minimum_count` times
-        
+
 
         Returns
         -------

@@ -41,7 +41,8 @@ jobs:
         # without --no-cache:
         # [Errno 13] Permission denied: '/home/travis/.cache/pip/wheels/'
         - python3 -m pip install -U --no-cache setuptools pip wheel Cython
-        - python3 -m pip install codecov
+        - python3 -m pip install flake8 codecov
+        - flake8
         - python3 setup.py sdist
         - python3 -m pip install --no-cache dist/*.tar.gz
         - pytest

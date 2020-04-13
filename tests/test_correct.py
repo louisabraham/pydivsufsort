@@ -1,5 +1,4 @@
 import array
-from functools import partial
 import random
 
 import numpy as np
