@@ -46,6 +46,7 @@ jobs:
         - python3 setup.py sdist
         - python3 -m pip install --no-cache dist/*.tar.gz
         - pytest
+        - python3 -c "import pydivsufsort; print(pydivsufsort)"
         - coverage run -m pytest
       after_success:
         - codecov
