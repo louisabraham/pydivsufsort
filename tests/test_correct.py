@@ -98,7 +98,7 @@ def test_containers():
 
 def test_small():
     for dtype in _SUPPORTED_DTYPES:
-        random_test(100, 10, dtype)
+        random_test(20, 10, dtype)
 
 
 def test_medium():
@@ -107,7 +107,7 @@ def test_medium():
 
 
 def test_minimize_dtype():
-    for _ in range(10000):
+    for _ in range(1000):
         dtype = random.choice(["uint8", "uint16", "uint32", "uint64"])
         inp = randint_type(100, dtype)
         inp = random_cast(inp)
@@ -129,31 +129,31 @@ def test_non_contiguous():
 
 
 def test_queries():
-    for n in [100] * 100 + [1000] * 10 + [100_000]:
-        q = min(n ** 2, 10_000)
+    for n in [100] * 10 + [1000] * 10 + [10_000]:
+        q = min(n ** 2, 1_000)
         inp = np.random.randint(3, size=n)
         queries = np.random.randint(n, size=(q, 2))
         assert_correct(inp, queries)
 
 
 def test_sa_search():
-    n = 1_000
-    for _ in range(10):
-        inp = np.random.randint(3, size=n, dtype=np.uint8)
-        print(inp.dtype)
-        sa = divsufsort(inp)
-        isa = np.argsort(sa)
-        for m in list(range(1, 5)) * 10:
-            query = np.random.randint(3, size=m, dtype=np.uint8)
-            print(inp.dtype)
-            matches = [i for i in range(n - m + 1) if (query == inp[i : i + m]).all()]
-            count = len(matches)
-            if count:
-                left = isa[matches].min()
-            else:
-                left = None
-            assert (count, left) == sa_search(inp, sa, query)
-            assert (sorted(isa[matches]) == np.arange(left, left + count)).all()
+    for n in [4, 1_000]:
+        for _ in range(10):
+            inp = np.random.randint(3, size=n, dtype=np.uint8)
+            sa = divsufsort(inp)
+            isa = np.argsort(sa)
+            for m in list(range(1, 5)) * 10:
+                query = np.random.randint(3, size=m, dtype=np.uint8)
+                matches = [
+                    i for i in range(n - m + 1) if (query == inp[i : i + m]).all()
+                ]
+                count = len(matches)
+                if count:
+                    left = isa[matches].min()
+                    assert (sorted(isa[matches]) == np.arange(left, left + count)).all()
+                else:
+                    left = None
+                assert (count, left) == sa_search(inp, sa, query)
 
 
 def test_levenshtein():
