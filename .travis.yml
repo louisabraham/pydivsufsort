@@ -47,7 +47,7 @@ jobs:
         - python3 -m pip install -e --no-cache dist/*.tar.gz
         - pytest
         - python3 -c "import pydivsufsort; print(pydivsufsort)"
-        - coverage run -m pytest
+        - coverage run -m pytest tests
       after_success:
         - codecov
         - |
