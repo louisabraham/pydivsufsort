@@ -40,6 +40,10 @@ def handle_input(s):
     return s
 
 
+"""
+TODO: reuse rank array for kasai and lcp_segtree
+"""
+
 def _kasai(string_t[::1] s not None, sa_t[::1] sa not None):
 
     cdef sa_t i, j, n, k
