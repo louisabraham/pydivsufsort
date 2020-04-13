@@ -1,6 +1,6 @@
 [![PyPI
 version](https://badge.fury.io/py/pydivsufsort.svg)](https://badge.fury.io/py/pydivsufsort) [![Build
-Status](https://travis-ci.com/louisabraham/pydivsufsort.svg?branch=master)](https://travis-ci.org/louisabraham/pydivsufsort)
+Status](https://travis-ci.com/louisabraham/pydivsufsort.svg?branch=master)](https://travis-ci.org/louisabraham/pydivsufsort) [![Coverage](https://codecov.io/gh/louisabraham/pydivsufsort/branch/master/graph/badge.svg)](https://codecov.io/gh/louisabraham/pydivsufsort)
 
 # `pydivsufsort`: bindings to libdivsufsort
 
