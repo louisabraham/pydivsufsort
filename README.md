@@ -21,7 +21,7 @@ On Linux, macOS and Windows:
 python -m pip install pydivsufsort
 ```
 
-We provide precompiled wheels for common systems, and a source distribution for Unix systems. Manual compilation on Windows might require some tweaking, please create an issue.
+We provide precompiled wheels for common systems using `cibuildwheel`, and a source distribution for Unix systems. Manual compilation on Windows might require some tweaking, please create an issue.
 
 ## Usage
 
