@@ -2,27 +2,27 @@ from itertools import zip_longest, islice
 import numpy as np
 
 
-def _to_int_keys(l):
+def _to_int_keys(it):
     """
-    l: iterable of keys
+    it: iterable of keys
     returns: a list with integer keys
     """
     seen = set()
     ls = []
-    for e in l:
+    for e in it:
         if e not in seen:
             ls.append(e)
             seen.add(e)
     ls.sort()
     index = {v: i for i, v in enumerate(ls)}
-    return [index[v] for v in l]
+    return [index[v] for v in it]
 
 
-def _inverse_array(l):
-    n = len(l)
+def _inverse_array(arr):
+    n = len(arr)
     ans = [0] * n
     for i in range(n):
-        ans[l[i]] = i
+        ans[arr[i]] = i
     return ans
 
 
@@ -50,8 +50,7 @@ def suffix_array(s):
 
 
 def longest_common_prefix(s, i, j):
-    """naive longest prefix of positions i and j
-    """
+    """naive longest prefix of positions i and j"""
     n = len(s)
     k = 0
     while max(i, j) + k < n and s[i + k] == s[j + k]:
