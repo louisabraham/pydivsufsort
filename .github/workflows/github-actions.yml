@@ -30,5 +30,7 @@ jobs:
           python -m pip install .
         shell: bash
       - name: Run Unit Tests
-        run: pytest
+        run: |
+          python -m pip install pytest
+          pytest
         shell: bash
