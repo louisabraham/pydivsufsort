@@ -25,7 +25,7 @@ jobs:
         shell: bash
       - name: Install Pydivsufsort And Other Dependencies
         run: |
-          pip install cython cmake numpy
+          python -m pip install -r requirements.txt
           ./build.sh
           python -m pip install .
         shell: bash
