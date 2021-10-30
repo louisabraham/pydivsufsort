@@ -53,6 +53,7 @@ jobs:
           pytest
         shell: bash
   build_wheels:
+    needs: unit-testing
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
