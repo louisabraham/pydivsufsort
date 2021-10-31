@@ -1,3 +1,5 @@
+python -m pip uninstall numpy
+python -m pip install --only-binary=:all: numpy
 python -m pip install -r requirements.txt
 git submodule init
 git submodule update
