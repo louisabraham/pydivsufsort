@@ -69,7 +69,10 @@ jobs:
         run: python -m pip install build
         shell: bash
       - name: Build Sdist
-        run: python -m build --sdist
+        run: |
+             if [ "$RUNNER_OS" == "Linux" ]; then
+                python -m build --sdist
+             fi
         shell: bash
       - name: Install Cibuildwheel
         run: python -m pip install cibuildwheel
