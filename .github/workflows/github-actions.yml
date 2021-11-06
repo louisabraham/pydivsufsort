@@ -71,6 +71,12 @@ jobs:
       - name: Display Python Version
         run: python -c "import sys; print(sys.version)"
         shell: bash
+      - name: Install Build
+        run: python -m pip install build
+        shell: bash
+      - name: Build Sdist
+        run: python -m build --sdist
+        shell: bash
       - name: Install Cibuildwheel
         run: python -m pip install cibuildwheel
         shell: bash
