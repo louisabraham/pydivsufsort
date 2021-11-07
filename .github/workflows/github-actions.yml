@@ -97,3 +97,4 @@ jobs:
           fi
           # Replace/remove echo
           echo "python -m twine upload --skip-existing wheelhouse/*.whl"
+        shell: bash
