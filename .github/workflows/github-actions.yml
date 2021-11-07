@@ -54,7 +54,7 @@ jobs:
       - name: Run Unit Tests
         run: |
           pytest tests
-          coverage run -m pytest tests
+          coverage run --source pydivsufsort -m pytest tests
         shell: bash
   build_wheels:
     needs: unit-testing
