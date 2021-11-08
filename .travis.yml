@@ -2,6 +2,9 @@ notifications:
   email: false
 language: shell
 
+env:
+  - NUMPY_BUILD_VERSION=1.10.4
+
 jobs:
   include:
     # linux build
@@ -9,12 +12,12 @@ jobs:
       language: python
       env:
         - PYTHON=python3
-        - CIBW_BEFORE_BUILD="pip install Cython numpy"
+        - CIBW_BEFORE_BUILD="pip install Cython numpy==$NUMPY_BUILD_VERSION"
     # macos build
     - os: osx
       env:
         - PYTHON=python3
-        - CIBW_BEFORE_BUILD="pip install Cython numpy"
+        - CIBW_BEFORE_BUILD="pip install Cython numpy==$NUMPY_BUILD_VERSION"
     # win_amd64 build
     - os: windows
       before_install:
@@ -24,7 +27,7 @@ jobs:
         - CIBW_BUILD="*-win_amd64"
         - PLATFORM_OPTION="-A x64"
         - PYTHON=/c/Python38/python.exe
-        - CIBW_BEFORE_BUILD="bash build.sh"
+        - CIBW_BEFORE_BUILD="pip install numpy==$NUMPY_BUILD_VERSION; bash build.sh"
     # win32 build
     - os: windows
       before_install:
@@ -33,14 +36,14 @@ jobs:
       env:
         - CIBW_BUILD="*-win32"
         - PYTHON=/c/Python38/python.exe
-        - CIBW_BEFORE_BUILD="bash build.sh"
+        - CIBW_BEFORE_BUILD="pip install numpy==$NUMPY_BUILD_VERSION; bash build.sh"
     - language: python
       arch: arm64
       install:
       script:
         # without --no-cache:
         # [Errno 13] Permission denied: '/home/travis/.cache/pip/wheels/'
-        - python3 -m pip install -U --no-cache setuptools pip wheel Cython
+        - python3 -m pip install -U --no-cache setuptools pip wheel Cython "numpy==$NUMPY_BUILD_VERSION"
         - python3 -m pip install flake8 codecov
         - flake8
         - python3 setup.py sdist
