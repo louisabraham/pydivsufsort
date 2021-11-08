@@ -1,3 +1,4 @@
+python -m pip install --upgrade pip
 python -m pip uninstall numpy
 python -m pip install --only-binary=:all: numpy=1.10.4
 python -m pip install -r requirements.txt
