@@ -26,7 +26,7 @@ jobs:
       - name: Install Pydivsufsort And Other Dependencies
         run: |
           bash ./cibw_before_build.sh
-          python -m pip install --no-cache-dir --no-binary :all: .
+          python -m pip install .
         shell: bash
       - name: Run Flake8
         run: flake8 .
