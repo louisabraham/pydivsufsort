@@ -3,10 +3,6 @@ git submodule update
 
 mkdir tempbuild
 cd tempbuild
-echo "********************"
-uname -a
-uname -m
-echo "********************"
 cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF -DUSE_OPENMP=ON $PLATFORM_OPTION ../libdivsufsort
 if [ "$RUNNER_OS" == "Windows" ]; then
     cmake --build . --config Release
