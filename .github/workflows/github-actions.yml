@@ -64,11 +64,10 @@ jobs:
       - name: Build Wheels
         env:
           CIBW_BEFORE_BUILD: bash ./cibw_before_build.sh
-          CIBW_SKIP: pp*
+          CIBW_SKIP: pp* *-win_amd64
           CIBW_BUILD_VERBOSITY: 1
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: "pytest {project}/tests"
-          CIBW_TEST_COMMAND_WINDOWS: 'pytest {project}\tests'
         run: |
           python -m cibuildwheel --output-dir wheelhouse
           ls wheelhouse/*
