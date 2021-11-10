@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: master
 jobs:
-  unit-testing:
+  testing:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -25,7 +25,7 @@ jobs:
         shell: bash
       - name: Install Pydivsufsort And Other Dependencies
         run: |
-          python -m pip install pytest flake8
+          python -m pip install pytest-cov flake8
           bash ./cibw_before_build.sh
           python -m pip install . -v
         shell: bash
@@ -36,8 +36,11 @@ jobs:
         run: |
           pytest tests
         shell: bash
+      - name: Run Coverage Tests
+        run: coverage run --source pydivsufsort -m py.test
+        shell: bash
   build_wheels:
-    needs: unit-testing
+    needs: testing
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -49,8 +52,8 @@ jobs:
           submodules: recursive
       - name: Set Up Python
         uses: actions/setup-python@v2
-      - name: Install Build
-        run: python -m pip install build
+      - name: Install Dependencies
+        run: python -m pip install build pytest
         shell: bash
       - name: Build Sdist
         run: |
