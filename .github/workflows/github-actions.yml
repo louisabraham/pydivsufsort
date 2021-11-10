@@ -49,6 +49,10 @@ jobs:
           submodules: recursive
       - name: Set Up Python
         uses: actions/setup-python@v2
+      - name: Detect Architecture
+        run: |
+          uname -s
+          uname -m
       - name: Install Dependencies
         run: python -m pip install build
         shell: bash
