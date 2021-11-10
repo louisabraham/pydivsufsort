@@ -67,7 +67,8 @@ jobs:
           CIBW_SKIP: pp*
           CIBW_BUILD_VERBOSITY: 1
           CIBW_TEST_REQUIRES: pytest
-          CIBW_TEST_COMMAND: "pytest {project}"
+          CIBW_TEST_COMMAND: "pytest {project}/tests"
+          CIBW_TEST_COMMAND_WINDOWS: 'pytest {project}\tests'
         run: |
           python -m cibuildwheel --output-dir wheelhouse
           ls wheelhouse/*
