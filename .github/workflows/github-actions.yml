@@ -25,7 +25,7 @@ jobs:
         shell: bash
       - name: Install Pydivsufsort And Other Dependencies
         run: |
-          python -m pip install pytest-cov flake8
+          python -m pip install pytest flake8
           bash ./cibw_before_build.sh
           python -m pip install . -v
         shell: bash
@@ -35,9 +35,6 @@ jobs:
       - name: Run Unit Tests
         run: |
           pytest tests
-        shell: bash
-      - name: Run Coverage Tests
-        run: coverage run --source pydivsufsort -m py.test
         shell: bash
   build_wheels:
     needs: testing
@@ -53,7 +50,7 @@ jobs:
       - name: Set Up Python
         uses: actions/setup-python@v2
       - name: Install Dependencies
-        run: python -m pip install build pytest
+        run: python -m pip install build
         shell: bash
       - name: Build Sdist
         run: |
@@ -69,6 +66,8 @@ jobs:
           CIBW_BEFORE_BUILD: bash ./cibw_before_build.sh
           CIBW_SKIP: pp*
           CIBW_BUILD_VERBOSITY: 1
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_TEST_COMMAND: "pytest {project}/tests"
         run: |
           python -m cibuildwheel --output-dir wheelhouse
           ls wheelhouse/*
