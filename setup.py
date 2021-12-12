@@ -85,3 +85,4 @@ setup(
     classifiers=[],
     cmdclass={"build": build, "bdist_wheel": bdist_wheel, "install": install},
 )
+
