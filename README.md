@@ -66,6 +66,18 @@ print(sentinel_suffix_array, sentinel_lcp_array)
 # [ 8  1 14 22 12  7  0 13 21  5 19  3  9 16  2 15 11 18  6 20  4 10 17] [0 0 0 0 0 1 1 1 1 3 3 2 3 0 3 0 1 0 2 2 1 2 0]
 ```
 
+
+## Development
+
+You can install locally with
+
+```
+pip install -e .
+```
+
+Note: on my M1 machine that uses a x86 version of Python, I have to launch `arch -x86_64 ./build.sh` to build `libdivsufsort` for the correct architecture.
+
+
 ## Testing
 
 ```
