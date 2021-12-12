@@ -72,8 +72,8 @@ jobs:
               shell: bash
             - name: Upload Builds
               env:
-                  TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
-                  TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+                  TWINE_USERNAME: __token__
+                  TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
               run: |
                   python -m pip install twine
                   if [ "$RUNNER_OS" == "Linux" ]; then
@@ -115,8 +115,8 @@ jobs:
               shell: bash
             - name: Upload Builds
               env:
-                  TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
-                  TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+                  TWINE_USERNAME: __token__
+                  TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
               run: |
                   python -m pip install twine
                   python -m twine upload --skip-existing wheelhouse/*.whl
@@ -154,8 +154,8 @@ jobs:
               shell: bash
             - name: Upload Builds
               env:
-                  TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
-                  TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+                  TWINE_USERNAME: __token__
+                  TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
               run: |
                   python -m pip install twine
                   python -m twine upload --skip-existing wheelhouse/*.whl
