@@ -2,6 +2,8 @@ name: Build and upload
 on:
     push:
         branches: master
+        paths:
+            - "setup.py"
 jobs:
     testing:
         runs-on: ${{ matrix.os }}
