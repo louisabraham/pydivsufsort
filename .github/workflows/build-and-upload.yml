@@ -3,7 +3,7 @@ on:
     push:
         branches: master
     pull_request:
-        branches: masterbranches: master
+        branches: master
 jobs:
     build_linux_macos_wheels:
         runs-on: ${{ matrix.os }}
