@@ -33,6 +33,5 @@ jobs:
               shell: bash
             - name: Run Unit Tests
               run: |
-                  pytest tests
                   coverage run -m pytest tests
               shell: bash
