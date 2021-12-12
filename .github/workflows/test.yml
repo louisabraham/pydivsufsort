@@ -1,7 +1,11 @@
 name: Test
 on:
-    - push
-    - pull_request
+    push:
+        branches-ignore:
+            - master
+    pull_request:
+        branches-ignore:
+            - master
 jobs:
     testing:
         runs-on: ${{ matrix.os }}
