@@ -1,8 +1,9 @@
 name: Build and upload
 on:
-    - push
-    - pull_request
-branches: master
+    push:
+        branches: master
+    pull_request:
+        branches: masterbranches: master
 jobs:
     build_linux_macos_wheels:
         runs-on: ${{ matrix.os }}
