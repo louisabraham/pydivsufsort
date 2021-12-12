@@ -23,7 +23,8 @@ jobs:
               shell: bash
             - name: Install Pydivsufsort And Other Dependencies
               run: |
-                  python -m pip install pytest flake8
+                  python -m pip install pytest flake8 coverage
+                  bash ./cibw_before_build.sh
                   python -m pip install . -v
               shell: bash
             - name: Run Flake8
@@ -32,4 +33,5 @@ jobs:
             - name: Run Unit Tests
               run: |
                   pytest tests
+                  coverage run -m pytest tests
               shell: bash
