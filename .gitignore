@@ -1,5 +1,6 @@
 *.so*
 *.dll
+*.dylib
 
 pydivsufsort/*.c
 pydivsufsort/*.cpp
