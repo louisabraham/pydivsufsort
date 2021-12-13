@@ -49,8 +49,8 @@ jobs:
                   submodules: recursive
             - name: Set Up Python
               uses: actions/setup-python@v2
-            - name: Upgrade pip
-              run: python -m pip install -U pip
+            - name: Install build and pip
+              run: python -m pip install -U pip build
               shell: bash
             - name: Build Sdist
               run: |
@@ -97,9 +97,6 @@ jobs:
                   submodules: recursive
             - name: Set Up Python
               uses: actions/setup-python@v2
-            - name: Install Dependencies
-              run: python -m pip install build
-              shell: bash
             - name: Install Cibuildwheel
               run: python -m pip install cibuildwheel
               shell: bash
@@ -136,9 +133,6 @@ jobs:
                   submodules: recursive
             - name: Set Up Python
               uses: actions/setup-python@v2
-            - name: Install Dependencies
-              run: python -m pip install build
-              shell: bash
             - name: Install Cibuildwheel
               run: python -m pip install cibuildwheel
               shell: bash
