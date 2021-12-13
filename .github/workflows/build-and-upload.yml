@@ -64,7 +64,7 @@ jobs:
             - name: Build Wheels
               env:
                   CIBW_BEFORE_BUILD: bash ./cibw_before_build.sh
-                  CIBW_SKIP: pp*, *-musllinux_*
+                  CIBW_SKIP: pp* *-musllinux_*
                   CIBW_BUILD_VERBOSITY: 1
                   CIBW_TEST_REQUIRES: pytest
                   CIBW_TEST_COMMAND: "pytest {project}/tests"
