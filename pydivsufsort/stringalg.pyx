@@ -1,13 +1,13 @@
 # cython: language_level=3, wraparound=False, boundscheck=False
-# distutils: language=c++
+# distutils: extra_compile_args=-O3
 
 cimport numpy as np
 import numpy as np
 
 import warnings
-
 from .divsufsort import divsufsort 
 
+ctypedef np.uint64_t ull
 
 ctypedef fused sa_t:
     np.int32_t
@@ -209,6 +209,7 @@ def levenshtein(a, b):
 
 from libcpp.pair cimport pair
 from libcpp.vector cimport vector
+from libcpp.map cimport map as cpp_map
 from libcpp.algorithm cimport sort
 
 # TODO: in Cython 0.30 reverse can be imported from libcpp.algorithm
@@ -260,11 +261,11 @@ def most_frequent_substrings(
             cur_count += 1
         else:
             if cur_count >= minimum_count:
-                count.push_back(pair[sa_t, sa_t](cur_count, cur))
+                count.push_back((cur_count, cur))
             cur = i + 1
             cur_count = 1
     if cur_count >= minimum_count:
-        count.push_back(pair[sa_t, sa_t](cur_count, cur))
+        count.push_back((cur_count, cur))
 
     sort(count.begin(), count.end())
     reverse(count.begin(), count.end())
@@ -280,3 +281,80 @@ def most_frequent_substrings(
         cnt[i] = count[i].first
 
     return pos, cnt
+
+
+cpdef repeated_substrings(ull[::1] suffix_array, ull[::1] lcp):
+    cdef vector[pair[ull, ull]] stack
+    # unordered_map might be faster but does not easily support pair as key
+    cdef cpp_map[pair[ull, ull], pair[ull, ull]] ranges
+    cdef pair[ull, ull] key
+    cdef ull n, idx, end_pos, len_range, start, length
+    n = len(lcp)
+    for idx in range(n):
+        if stack.empty() or lcp[idx] > stack.back().first:
+            if lcp[idx] > 0:
+                stack.push_back((lcp[idx], idx))
+        else:
+            while not stack.empty() and lcp[idx] < stack.back().first:
+                length, start = stack.back()
+                stack.pop_back()
+                end_pos = suffix_array[idx] + length
+                len_range = idx + 1 - start
+
+                # we deduplicate the ranges as two equivalent occurrences have
+                # the same ending position in the strings and
+                # the same range in the suffix array
+                key = end_pos, len_range
+                if ranges[key].second < length: # use default allocator since default is 0
+                    ranges[key] = start, length
+                    
+            if lcp[idx] > 0:
+                continue
+            if stack.empty() or lcp[idx] > stack.back().first:
+                stack.push_back((lcp[idx], start))
+    # stack is empty because lcp[n-1] == 0
+    # note: lcp[n-2] is also 0 because of sep
+
+    ans = []
+    for (end_pos, len_range), (start, length) in ranges:
+        ans.append((start, start + len_range, length))
+    return ans
+
+
+def _common_substrings(np.ndarray[ull, ndim=1] suffix_array, ull[::1] lcp, ull len1, ull limit):
+    n = len(suffix_array)
+    ranges = repeated_substrings(suffix_array, lcp)
+
+    # origin_cumsum can be use to check faster that
+    # a range contains only suffixes from s1 or s2
+    origin = suffix_array < len1
+    cdef np.ndarray[ull, ndim=1] origin_cumsum = np.empty(n + 1, dtype=np.uint64)
+    origin_cumsum[0] = 0
+    origin_cumsum[1:] = np.cumsum(origin)
+
+    cdef cpp_map[pair[ull, ull], ull] ans
+    cdef vector[np.uint64_t] start1, start2
+    ranges.sort(key=lambda x: x[2]) # sort to avoid membership test
+    cdef ull start, end, length, diff
+    for start, end, length in ranges:
+        if length < limit:
+            continue
+        diff = origin_cumsum[end] - origin_cumsum[start]
+        if diff == 0 or diff == end - start:
+            continue
+        start1.clear()
+        start2.clear()
+        for i in range(start, end):
+            pos = suffix_array[i]
+            if pos < len1: # origin[i]
+                start1.push_back(pos)
+            else:
+                start2.push_back(pos - len1 - 1)
+        sort(start1.begin(), start1.end())
+        sort(start2.begin(), start2.end())
+        for i in start1:
+            for j in start2:
+                ans[(i, j)] = length
+    
+    return [(i, j, l) for (i, j), l in ans]
+

@@ -13,6 +13,7 @@ from pydivsufsort import (
     sa_search,
     levenshtein,
     most_frequent_substrings,
+    common_substrings,
 )
 from pydivsufsort.divsufsort import _SUPPORTED_DTYPES, _minimize_dtype
 
@@ -30,8 +31,7 @@ def cast_to_str(inp):
 
 
 def cast_to_np_array(inp):
-    """cast back any type to an array
-    """
+    """cast back any type to an array"""
     if isinstance(inp, str):
         inp = inp.encode("ascii")
     return np.array(list(inp))
@@ -129,7 +129,7 @@ def test_non_contiguous():
 
 def test_queries():
     for n in [100] * 10 + [1000] * 10 + [10_000]:
-        q = min(n ** 2, 1_000)
+        q = min(n**2, 1_000)
         inp = np.random.randint(3, size=n)
         queries = np.random.randint(n, size=(q, 2))
         assert_correct(inp, queries)
@@ -166,3 +166,10 @@ def test_mfs():
     pos, cnt = most_frequent_substrings(lcp, 3, limit=2)
     assert (sa[pos] == [6, 5]).all()
     assert (cnt == [4, 3]).all()
+
+
+def test_common_substrings():
+    s1 = "ananas"
+    s2 = "banana"
+    ans = common_substrings(s1, s2, limit=2)
+    assert ans == [(0, 1, 5), (0, 3, 3), (2, 1, 3), (2, 3, 3)]
