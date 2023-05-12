@@ -324,7 +324,7 @@ cpdef repeated_substrings(ull[::1] suffix_array, ull[::1] lcp):
 def _common_substrings(np.ndarray[ull, ndim=1] suffix_array, ull[::1] lcp, ull len1, ull limit):
     n = len(suffix_array)
     ranges = repeated_substrings(suffix_array, lcp)
-
+    
     # origin_cumsum can be use to check faster that
     # a range contains only suffixes from s1 or s2
     origin = suffix_array < len1
@@ -346,7 +346,7 @@ def _common_substrings(np.ndarray[ull, ndim=1] suffix_array, ull[::1] lcp, ull l
         start2.clear()
         for i in range(start, end):
             pos = suffix_array[i]
-            if pos < len1: # origin[i]
+            if origin[i]: # might be faster than pos < len1 thanks to cache lookup
                 start1.push_back(pos)
             else:
                 start2.push_back(pos - len1 - 1)
@@ -357,4 +357,3 @@ def _common_substrings(np.ndarray[ull, ndim=1] suffix_array, ull[::1] lcp, ull l
                 ans[(i, j)] = length
     
     return [(i, j, l) for (i, j), l in ans]
-
