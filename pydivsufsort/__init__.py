@@ -20,4 +20,5 @@ __all__ = [
     "levenshtein",
     "most_frequent_substrings",
     "WonderString",
+    "common_substrings",
 ]
