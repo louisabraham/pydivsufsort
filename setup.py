@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+
+import os
 from pathlib import Path
 import platform
 from subprocess import Popen
@@ -11,6 +13,16 @@ from Cython.Build import cythonize
 
 import numpy
 
+PROFILE = os.environ.get("PROFILE", False)
+
+if PROFILE:
+    from Cython.Compiler.Options import get_directive_defaults
+
+    directive_defaults = get_directive_defaults()
+    directive_defaults["linetrace"] = True
+    directive_defaults["binding"] = True
+
+
 # make the wheel platform specific
 # https://stackoverflow.com/a/45150383
 try:
@@ -21,7 +33,6 @@ try:
             _bdist_wheel.finalize_options(self)
             self.root_is_pure = False
 
-
 except ImportError:
     bdist_wheel = None
 
@@ -31,6 +42,10 @@ class build(_build):
         if platform.system() == "Windows":
             witness = Path(__file__).parent / "pydivsufsort/divsufsort.dll"
             assert witness.exists(), "Launch ./build.sh first"
+        elif platform.system() == "Darwin" and platform.machine() == "x86_64":
+            script = Path(__file__).parent / "build.sh"
+            path = script.absolute().as_posix()
+            Popen(["arch", "-x86_64", path], shell=False).wait()
         else:
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
@@ -53,7 +68,8 @@ extensions = [
         "pydivsufsort.stringalg",
         ["pydivsufsort/stringalg.pyx"],
         include_dirs=[numpy.get_include()],
-        # language="c++",
+        language="c++",
+        define_macros=[("CYTHON_TRACE", "1")] if PROFILE else None,
     )
 ]
 

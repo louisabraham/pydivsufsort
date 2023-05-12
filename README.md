@@ -75,8 +75,40 @@ You can install locally with
 pip install -e .
 ```
 
-Note: on my M1 machine that uses a x86 version of Python, I have to launch `arch -x86_64 ./build.sh` to build `libdivsufsort` for the correct architecture.
+A useful command to iterate quickly when changing Cython code is
 
+```
+python setup.py build_ext --inplace && pytest -s
+```
+
+### Profiling
+
+Profiling can be activated with the environment variable `PROFILE`:
+
+```
+PROFILE=1 python setup.py build_ext --inplace && pytest -s
+```
+
+Here is an example with line_profiler (requires `pip install "line_profiler<4"`):
+
+```
+import line_profiler
+from pydivsufsort import common_substrings
+from pydivsufsort.stringalg import (
+    _common_substrings,
+    repeated_substrings,
+)
+
+s1 = "banana" * 10000
+s2 = "ananas" * 10000
+
+func = common_substrings
+profile = line_profiler.LineProfiler(func)
+profile.add_function(_common_substrings)
+profile.add_function(repeated_substrings)
+profile.runcall(func, s1, s2, limit=15)
+profile.print_stats()
+```
 
 ## Testing
 
