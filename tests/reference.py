@@ -87,6 +87,3 @@ def iBWT(idx, b):
         ans.append(c[0])
         c = first[ilast[c] - 1]
     return ans
-
-
-print(iBWT(*BWT("banana")))
