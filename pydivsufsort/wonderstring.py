@@ -10,22 +10,27 @@ from . import (
     lcp_query,
     most_frequent_substrings,
 )
+from .stringalg import _common_substrings
 
 SearchResult = namedtuple("SearchResult", ("count", "position"))
 
 MFSResult = namedtuple("MFSResult", ("positions", "counts"))
 
 
+def cast_to_numpy(inp, copy=True):
+    if isinstance(inp, str):
+        try:
+            inp = inp.encode("ascii")
+        except UnicodeEncodeError:
+            raise TypeError("str must only contain ascii chars")
+    if isinstance(inp, bytes):
+        inp = np.frombuffer(inp, dtype=np.uint8)
+    return np.ascontiguousarray(_cast(np.array(inp, copy=copy)))
+
+
 class WonderString:
     def __init__(self, inp, copy=True):
-        if isinstance(inp, str):
-            try:
-                inp = inp.encode("ascii")
-            except UnicodeEncodeError:
-                raise TypeError("str must only contain ascii chars")
-        if isinstance(inp, bytes):
-            inp = np.frombuffer(inp, dtype=np.uint8)
-        self.string = np.ascontiguousarray(_cast(np.array(inp, copy=copy)))
+        self.string = cast_to_numpy(inp, copy)
         self.itemsize = self.string.dtype.itemsize
 
     @property
@@ -118,3 +123,26 @@ class WonderString:
             self.lcp_array, length, limit, minimum_count
         )
         return MFSResult(self.suffix_array[pos], cnt)
+
+
+def common_substrings(s1, s2, limit=25):
+    """All common substrings
+    Returns a list of tuples describing the common substrings
+    The tuples are (length, idx1, idx2) where
+    idx1 and idx2 are lists of positions in s1 and s2
+    Only the pairs with length >= limit are returned
+    The pairs are sorted by decreasing length, then by idx1[0], then by idx[1]
+    """
+    # TODO: in Cython 0.30, use fused types to avoid casting
+    s1 = cast_to_numpy(s1)
+    s2 = cast_to_numpy(s2)
+    sep = max(s1.max(), s2.max()) + 1
+    s = np.empty(len(s1) + len(s2) + 1, dtype=np.result_type(s1[0], s2[0], sep))
+    s[: len(s1)] = s1
+    s[len(s1)] = sep
+    s[len(s1) + 1 :] = s2
+    suffix_array = divsufsort(s)
+    lcp = kasai(s, suffix_array)
+    return _common_substrings(
+        suffix_array.astype(np.uint64), lcp.astype(np.uint64), len(s1), limit
+    )

@@ -6,7 +6,7 @@ from .stringalg import (
     levenshtein,
     most_frequent_substrings,
 )
-from .wonderstring import WonderString
+from .wonderstring import WonderString, common_substrings
 
 
 __all__ = [
@@ -20,4 +20,5 @@ __all__ = [
     "levenshtein",
     "most_frequent_substrings",
     "WonderString",
+    "common_substrings",
 ]
