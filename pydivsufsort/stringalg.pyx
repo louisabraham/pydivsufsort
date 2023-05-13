@@ -284,6 +284,26 @@ def most_frequent_substrings(
 
 
 cpdef repeated_substrings(ull[::1] suffix_array, ull[::1] lcp):
+    """
+    Algorithm taken from code.google.com/p/py-rstr-max
+    See https://github.com/louisabraham/pydivsufsort/issues/42 for more details
+    
+    Parameters
+    ----------
+    suffix_array : np.ndarray
+        suffix array
+    lcp : np.ndarray
+        LCP array
+    
+    Returns
+    -------
+    ranges : list
+        list of (start, end, length) tuples
+        All positions in suffix_array[start:end] correspond to
+        the same substring with that length.
+        Those ranges are maximal and exclusive because only the match
+        with the largest length will be returned.
+    """
     cdef vector[pair[ull, ull]] stack
     # unordered_map might be faster but does not easily support pair as key
     cdef cpp_map[pair[ull, ull], pair[ull, ull]] ranges
