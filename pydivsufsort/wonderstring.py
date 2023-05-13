@@ -128,10 +128,10 @@ class WonderString:
 def common_substrings(s1, s2, limit=25):
     """All common substrings
     Returns a list of tuples describing the common substrings
-    The tuples are (length, idx1, idx2) where
-    idx1 and idx2 are lists of positions in s1 and s2
+    The tuples are (idx1, idx2, length) where
+    idx1 and idx2 are positions in s1 and s2
     Only the pairs with length >= limit are returned
-    The pairs are sorted by decreasing length, then by idx1[0], then by idx[1]
+    The pairs are sorted by (idx1, idx2)
     """
     # TODO: in Cython 0.30, use fused types to avoid casting
     s1 = cast_to_numpy(s1)
