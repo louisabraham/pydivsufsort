@@ -75,7 +75,7 @@ extensions = [
 
 setup(
     name="pydivsufsort",
-    version="0.0.7",
+    version="0.0.8",
     author="Louis Abraham",
     license="MIT",
     author_email="louis.abraham@yahoo.fr",
