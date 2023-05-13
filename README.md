@@ -1,5 +1,5 @@
 [![PyPI
-version](https://badge.fury.io/py/pydivsufsort.svg)](https://badge.fury.io/py/pydivsufsort) [![Downloads](https://pepy.tech/badge/pydivsufsort)](https://pepy.tech/project/pydivsufsort) [![Test](https://github.com/louisabraham/pydivsufsort/actions/workflows/test.yml/badge.svg)](https://github.com/louisabraham/pydivsufsort/actions/workflows/test.yml) [![Build and upload](https://github.com/louisabraham/pydivsufsort/actions/workflows/build-and-upload.yml/badge.svg)](https://github.com/louisabraham/pydivsufsort/actions/workflows/build-and-upload.yml) [![codecov](https://codecov.io/gh/louisabraham/pydivsufsort/branch/master/graph/badge.svg?token=A1BM9U1OLV)](https://codecov.io/gh/louisabraham/pydivsufsort)
+version](https://badge.fury.io/py/pydivsufsort.svg)](https://badge.fury.io/py/pydivsufsort) [![Downloads](https://pepy.tech/badge/pydivsufsort)](https://pepy.tech/project/pydivsufsort) [![Test](https://github.com/louisabraham/pydivsufsort/actions/workflows/test.yml/badge.svg)](https://github.com/louisabraham/pydivsufsort/actions/workflows/test.yml) [![Build and upload](https://github.com/louisabraham/pydivsufsort/actions/workflows/build-and-upload.yml/badge.svg)](https://github.com/louisabraham/pydivsufsort/actions/workflows/build-and-upload.yml) [![codecov](https://codecov.io/gh/louisabraham/pydivsufsort/branch/master/graph/badge.svg?token=A1BM9U1OLV)](https://codecov.io/gh/louisabraham/pydivsufsort) [![DOI](https://zenodo.org/badge/241137939.svg)](https://zenodo.org/badge/latestdoi/241137939)
 
 # `pydivsufsort`: bindings to libdivsufsort
 
@@ -130,3 +130,18 @@ The original `libdivsufsort` only supports char as the base type. `pydivsufsort`
 
 - [Yuta Mori](https://github.com/y-256) for writing [libdivsufsort](https://github.com/y-256/libdivsufsort)
 - [Sean Law](http://seanlaw.github.io/) for initiating this project and contributing
+
+## Citing
+
+If you have used this software in a scientific publication, please cite it using the following BibLaTeX code:
+
+```
+@software{pydivsufsort,
+  author       = {Louis Abraham},
+  title        = {pydivsufsort},
+  year         = 2023,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.7932458},
+  url          = {https://doi.org/10.5281/zenodo.7932458}
+}
+```
