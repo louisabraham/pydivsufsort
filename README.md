@@ -142,6 +142,6 @@ If you have used this software in a scientific publication, please cite it using
   year         = 2023,
   publisher    = {Zenodo},
   doi          = {10.5281/zenodo.7932458},
-  url          = {https://doi.org/10.5281/zenodo.7932458}
+  url          = {https://github.com/louisabraham/pydivsufsort}
 }
 ```
