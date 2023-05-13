@@ -285,7 +285,6 @@ def most_frequent_substrings(
 
 cpdef repeated_substrings(ull[::1] suffix_array, ull[::1] lcp):
     """
-    Algorithm taken from code.google.com/p/py-rstr-max
     See https://github.com/louisabraham/pydivsufsort/issues/42 for more details
     
     Parameters
@@ -300,15 +299,12 @@ cpdef repeated_substrings(ull[::1] suffix_array, ull[::1] lcp):
     ranges : list
         list of (start, end, length) tuples
         All positions in suffix_array[start:end] correspond to
-        the same substring with that length.
-        Those ranges are maximal and exclusive because only the match
-        with the largest length will be returned.
+        the same repeated substring with that length.
     """
     cdef vector[pair[ull, ull]] stack
-    # unordered_map might be faster but does not easily support pair as key
-    cdef cpp_map[pair[ull, ull], pair[ull, ull]] ranges
     cdef pair[ull, ull] key
     cdef ull n, idx, end_pos, len_range, start, length
+    cdef list ans = []
     n = len(lcp)
     for idx in range(n):
         if stack.empty() or lcp[idx] > stack.back().first:
@@ -318,33 +314,19 @@ cpdef repeated_substrings(ull[::1] suffix_array, ull[::1] lcp):
             while not stack.empty() and lcp[idx] < stack.back().first:
                 length, start = stack.back()
                 stack.pop_back()
-                end_pos = suffix_array[idx] + length
-                len_range = idx + 1 - start
+                ans.append((start, idx + 1, length))
 
-                # we deduplicate the ranges as two equivalent occurrences have
-                # the same ending position in the strings and
-                # the same range in the suffix array
-                key = end_pos, len_range
-                if ranges[key].second < length: # use default allocator since default is 0
-                    ranges[key] = start, length
-                    
-            if lcp[idx] > 0:
-                continue
-            if stack.empty() or lcp[idx] > stack.back().first:
+            if stack.empty() and lcp[idx] > 0 or lcp[idx] > stack.back().first:
                 stack.push_back((lcp[idx], start))
     # stack is empty because lcp[n-1] == 0
     # note: lcp[n-2] is also 0 because of sep
 
-    ans = []
-    for (end_pos, len_range), (start, length) in ranges:
-        ans.append((start, start + len_range, length))
     return ans
 
 
 def _common_substrings(np.ndarray[ull, ndim=1] suffix_array, ull[::1] lcp, ull len1, ull limit):
     n = len(suffix_array)
     ranges = repeated_substrings(suffix_array, lcp)
-    
     # origin_cumsum can be use to check faster that
     # a range contains only suffixes from s1 or s2
     origin = suffix_array < len1
@@ -374,6 +356,18 @@ def _common_substrings(np.ndarray[ull, ndim=1] suffix_array, ull[::1] lcp, ull l
         sort(start2.begin(), start2.end())
         for i in start1:
             for j in start2:
-                ans[(i, j)] = length
+                # deduplicate start positions
+                # needed first to remove smaller matches
+                ans[i, j] = length
     
-    return [(i, j, l) for (i, j), l in ans]
+    # deduplicate end positions
+    cdef cpp_map[pair[ull, ull], ull] ans1
+    for (i, j), l in ans:
+        i += l
+        j += l
+        if ans1[i, j] < l:
+            ans1[i, j] = l
+    
+    ans2 = [(i - l, j - l, l) for (i, j), l in ans1]
+    ans2.sort()
+    return ans2

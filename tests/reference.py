@@ -1,3 +1,4 @@
+from collections import defaultdict
 from itertools import zip_longest, islice
 import numpy as np
 
@@ -87,3 +88,18 @@ def iBWT(idx, b):
         ans.append(c[0])
         c = first[ilast[c] - 1]
     return ans
+
+
+def all_common_substrings(s1, s2):
+    ans = defaultdict(int)
+    for i in range(len(s1)):
+        for j in range(len(s2)):
+            for k in range(min(len(s1) - i, len(s2) - j)):
+                if s1[i + k] != s2[j + k]:
+                    break
+            else:
+                k += 1
+            if k:
+                ans[i + k, j + k] = max(ans[i + k, j + k], k)
+
+    return sorted((i - k, j - k, k) for (i, j), k in ans.items())

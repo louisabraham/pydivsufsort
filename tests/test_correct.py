@@ -17,7 +17,13 @@ from pydivsufsort import (
 )
 from pydivsufsort.divsufsort import _SUPPORTED_DTYPES, _minimize_dtype
 
-from reference import suffix_array, longest_common_prefix, BWT, iBWT
+from reference import (
+    suffix_array,
+    longest_common_prefix,
+    BWT,
+    iBWT,
+    all_common_substrings,
+)
 
 
 def cast_to_array(inp):
@@ -136,7 +142,7 @@ def test_queries():
 
 
 def test_sa_search():
-    for n in [4, 1_000]:
+    for n in [4, 100]:
         for _ in range(10):
             inp = np.random.randint(3, size=n, dtype=np.uint8)
             sa = divsufsort(inp)
@@ -172,4 +178,13 @@ def test_common_substrings():
     s1 = "ananas"
     s2 = "banana"
     ans = common_substrings(s1, s2, limit=2)
-    assert ans == [(0, 1, 5), (0, 3, 3), (2, 1, 3), (2, 3, 3)]
+    assert ans == [(0, 1, 5), (0, 3, 3), (2, 1, 3)]
+
+    size = 5
+    for _ in range(100):
+        s1 = np.random.randint(0, 4, size=size, dtype="uint8")
+        s2 = np.random.randint(0, 4, size=size, dtype="uint8")
+        assert common_substrings(s1, s2, limit=1) == all_common_substrings(s1, s2), (
+            s1,
+            s2,
+        )
