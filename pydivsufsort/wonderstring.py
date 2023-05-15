@@ -93,9 +93,9 @@ class WonderString:
 
     def lcp(self, *args):
         if len(args) == 1:
-            return lcp_query(*self._lcp_segtree, args[0])
+            return lcp_query(self._lcp_segtree, args[0])
         elif len(args) == 2:
-            return lcp_query(*self._lcp_segtree, [args])[0]
+            return lcp_query(self._lcp_segtree, [args])[0]
 
     def most_frequent_substrings(self, length, limit=0, minimum_count=1):
         """

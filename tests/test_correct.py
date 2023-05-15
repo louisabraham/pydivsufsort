@@ -54,7 +54,7 @@ def assert_correct(inp, queries=None):
     if queries is None:
         n = len(inp)
         queries = [[0, 0], [0, n - 2], [0, n - 1], [n - 2, n - 2], [n - 1, n - 1]]
-    lcp_opt = lcp_query(*segtree, queries)
+    lcp_opt = lcp_query(segtree, queries)
     lcp_naive = [longest_common_prefix(inp, i, j) for i, j in queries]
     assert (lcp_opt == lcp_naive).all(), (inp, lcp_naive, lcp_opt)
 

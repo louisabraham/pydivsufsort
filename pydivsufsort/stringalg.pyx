@@ -141,7 +141,7 @@ def lcp_segtree(s, sa=None, lcp=None):
     return _lcp_segtree(s, sa, lcp)
 
 
-def lcp_query(
+def _lcp_query(
         np.ndarray[sa_t, ndim=1] rank not None,
         np.ndarray[sa_t, ndim=1] segtree not None,
         queries
@@ -180,6 +180,9 @@ def lcp_query(
             r >>= 1 
         ans[i] = res
     return ans
+
+def lcp_query(segtree, queries):
+    return _lcp_query(*segtree, queries)
 
 def _levenshtein(string_t[::1] a not None, string_t[::1] b not None):
     cdef unsigned long long n, m, i, j, d
