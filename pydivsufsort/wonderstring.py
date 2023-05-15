@@ -1,7 +1,6 @@
 import numpy as np
 from collections import namedtuple
 
-from .divsufsort import _cast
 from . import (
     divsufsort,
     sa_search,
@@ -25,7 +24,7 @@ def cast_to_numpy(inp, copy=True):
             raise TypeError("str must only contain ascii chars")
     if isinstance(inp, bytes):
         inp = np.frombuffer(inp, dtype=np.uint8)
-    return np.ascontiguousarray(_cast(np.array(inp, copy=copy)))
+    return np.ascontiguousarray(np.array(inp, copy=copy))
 
 
 class WonderString:
