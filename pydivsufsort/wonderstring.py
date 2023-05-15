@@ -57,6 +57,7 @@ class WonderString:
                     self.suffix_array_bytes[
                         self.suffix_array_bytes % self.itemsize == 0
                     ]
+                    // self.itemsize
                 )
         return self._suffix_array
 
