@@ -1,5 +1,5 @@
 import numpy as np
-from pydivsufsort import WonderString, kasai
+from pydivsufsort import WonderString
 import pytest
 
 
