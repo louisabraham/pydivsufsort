@@ -227,6 +227,10 @@ def most_frequent_substrings(
     sa_t minimum_count = 1
     ):
     """
+    Find the most frequent substrings of a given length in a string.
+    If `limit` is not 0, only the `limit` most frequent substrings are returned.
+    If `minimum_count` is not 1, only the substrings that occur at least `minimum_count` times are returned.
+
     Parameters
     ----------
 
