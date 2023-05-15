@@ -53,8 +53,7 @@ _SUPPORTED_DTYPES = {
 
 
 def _get_bytes_pointer(inp):
-    """Returns pointer to bytes-like input
-    """
+    """Returns pointer to bytes-like input"""
     if isinstance(inp, np.ndarray):
         assert inp.dtype == np.uint8
         # https://stackoverflow.com/q/60848009/5133167
