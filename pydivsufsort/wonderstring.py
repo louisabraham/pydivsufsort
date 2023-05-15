@@ -73,7 +73,7 @@ class WonderString:
 
         if return_positions:
             if not ans.count:
-                return np.empty_like(self.suffix_array)
+                return self.suffix_array[:0]
             return self.suffix_array[ans.position : ans.position + ans.count]
         return ans
 
