@@ -94,10 +94,8 @@ def all_common_substrings(s1, s2):
     ans = defaultdict(int)
     for i in range(len(s1)):
         for j in range(len(s2)):
-            for k in range(min(len(s1) - i, len(s2) - j)):
-                if s1[i + k] != s2[j + k]:
-                    break
-            else:
+            k = 0
+            while i + k < len(s1) and j + k < len(s2) and s1[i + k] == s2[j + k]:
                 k += 1
             if k:
                 ans[i + k, j + k] = max(ans[i + k, j + k], k)
