@@ -43,10 +43,8 @@ def suffix_array(s):
             ]
         )
         k <<= 1
-    if n <= np.iinfo(np.int32).max:
-        dtype = np.int32
-    else:
-        dtype = np.int64
+
+    dtype = np.int32 if n <= np.iinfo(np.int32).max else np.int64
     return np.array(_inverse_array(line), dtype=dtype)
 
 
