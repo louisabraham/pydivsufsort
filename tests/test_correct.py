@@ -217,8 +217,11 @@ def test64():
     s = "banana"
     sa = divsufsort(s, force64=True)
     assert sa.dtype == np.int64
-    assert (sa == np.array([5, 3, 1, 0, 4, 2])).all()
+    assert (sa == divsufsort(s)).all()
 
     bwt = bw_transform(s, force64=True)
     tr = inverse_bw_transform(*bwt, force64=True)
-    assert (tr == np.array([98, 97, 110, 97, 110, 97])).all()
+    assert (tr == np.array(list(s.encode("ascii")))).all()
+
+    res = sa_search(s, sa, "an")
+    assert res == (2, 1)
