@@ -85,7 +85,7 @@ def _cast(inp):
     return _minimize_dtype(_as_unsigned(inp))
 
 
-def divsufsort(inp):
+def divsufsort(inp, force64=False):
     if isinstance(inp, np.ndarray):
         if inp.dtype == np.uint8:
             pass
@@ -99,7 +99,7 @@ def divsufsort(inp):
 
     n = len(inp)
     inp_p = _get_bytes_pointer(inp)
-    if n <= np.iinfo(np.int32).max:
+    if n <= np.iinfo(np.int32).max and not force64:
         out = (ctypes.c_int32 * n)()
         out_p = ctypes.byref(out)
         retval = libdivsufsort.divsufsort(inp_p, out_p, ctypes.c_int32(n))
@@ -120,7 +120,7 @@ DTYPE_NOT_SUPPORTED_MSG = (
 )
 
 
-def bw_transform(inp, sa=None):
+def bw_transform(inp, sa=None, force64=False):
     # TODO: inplace computation
     if isinstance(inp, np.ndarray):
         if inp.dtype == np.uint8:
@@ -141,7 +141,12 @@ def bw_transform(inp, sa=None):
 
     out = (ctypes.c_uint8 * n)()
     out_p = ctypes.byref(out)
-    if sa is not None and sa.dtype == np.int32 or n <= np.iinfo(np.int32).max:
+    if (
+        sa is not None
+        and sa.dtype == np.int32
+        or n <= np.iinfo(np.int32).max
+        and not force64
+    ):
         idx = ctypes.c_int32()
         idx_p = ctypes.byref(idx)
         retval = libdivsufsort.bw_transform(
@@ -160,7 +165,7 @@ def bw_transform(inp, sa=None):
     return idx.value, np.ctypeslib.as_array(out)
 
 
-def inverse_bw_transform(idx, bwt):
+def inverse_bw_transform(idx, bwt, force64=False):
     # TODO: inplace computation
     n = len(bwt)
     bwt_p = _get_bytes_pointer(bwt)
@@ -168,7 +173,7 @@ def inverse_bw_transform(idx, bwt):
     out = (ctypes.c_uint8 * n)()
     out_p = ctypes.byref(out)
 
-    if n <= np.iinfo(np.int32).max:
+    if n <= np.iinfo(np.int32).max and not force64:
         retval = libdivsufsort.inverse_bw_transform(
             bwt_p, out_p, None, ctypes.c_int32(n), ctypes.c_int32(idx)
         )

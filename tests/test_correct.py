@@ -211,3 +211,14 @@ def test_warnings_errors():
 
     with pytest.raises(TypeError):
         divsufsort(np.array([0.0]))
+
+
+def test64():
+    s = "banana"
+    sa = divsufsort(s, force64=True)
+    assert sa.dtype == np.int64
+    assert (sa == np.array([5, 3, 1, 0, 4, 2])).all()
+
+    bwt = bw_transform(s, force64=True)
+    tr = inverse_bw_transform(*bwt, force64=True)
+    assert (tr == np.array([98, 97, 110, 97, 110, 97])).all()
