@@ -2,6 +2,7 @@ import array
 import random
 
 import numpy as np
+import pytest
 
 from pydivsufsort import (
     divsufsort,
@@ -60,6 +61,9 @@ def assert_correct(inp, queries=None):
 
     if not (isinstance(inp, np.ndarray) and inp.dtype != np.uint8):
         bwt_opt = bw_transform(inp)
+        bwt_opt2 = bw_transform(inp, sa)
+        assert bwt_opt[0] == bwt_opt2[0]
+        assert (bwt_opt[1] == bwt_opt2[1]).all()
         bwt_naive = BWT(inp)
         assert bwt_opt[0] == bwt_naive[0]
         assert (bwt_opt[1] == bwt_naive[1]).all()
@@ -188,3 +192,22 @@ def test_common_substrings():
             s1,
             s2,
         )
+
+
+def test_warnings_errors():
+    with pytest.warns(None):
+        divsufsort("a" * 1000)
+    import ctypes
+
+    # creates ctypes array
+
+    s = (ctypes.c_char * 6)()
+    s[:] = b"banana"
+    with pytest.warns(None):
+        assert np.alltrue(divsufsort(s) == np.array([5, 3, 1, 0, 4, 2]))
+
+    with pytest.raises(TypeError):
+        divsufsort("é")
+
+    with pytest.raises(TypeError):
+        divsufsort(np.array([0.0]))
