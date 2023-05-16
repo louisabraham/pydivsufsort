@@ -212,6 +212,9 @@ def test_warnings_errors():
     with pytest.raises(TypeError):
         divsufsort(np.array([0.0]))
 
+    with pytest.raises(TypeError):
+        bw_transform(np.array([0]))
+
 
 def test64():
     s = "banana"
