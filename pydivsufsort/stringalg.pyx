@@ -378,3 +378,48 @@ def _common_substrings(np.ndarray[ull, ndim=1] suffix_array, ull[::1] lcp, ull l
     ans2 = [(i - l, j - l, l) for (i, j), l in ans1]
     ans2.sort()
     return ans2
+
+
+cdef inline ull _clip(ull x, ull n):
+    if x < n:
+        return x
+    return x - n
+
+
+def _min_rotation(string_t[::1] s):
+    cdef ull a = 0
+    cdef ull n = len(s)
+    b = 0
+    while b < n:
+        for i in range(n):
+            if a + i == b or s[_clip(a + i, n)] < s[_clip(b + i, n)]:
+                b += max(0, i - 1)
+                break
+            if s[_clip(a + i, n)] > s[_clip(b + i, n)]:
+                a = b
+                break
+        b += 1
+    return a
+
+
+def _min_rotation_bytes(const unsigned char[::1] s):
+    cdef ull a = 0
+    cdef ull n = len(s)
+    b = 0
+    while b < n:
+        for i in range(n):
+            if a + i == b or s[_clip(a + i, n)] < s[_clip(b + i, n)]:
+                b += max(0, i - 1)
+                break
+            if s[_clip(a + i, n)] > s[_clip(b + i, n)]:
+                a = b
+                break
+        b += 1
+    return a
+
+
+def min_rotation(s):
+    s = handle_input(s)
+    if isinstance(s, bytes):
+        return _min_rotation_bytes(s)
+    return _min_rotation(s)

@@ -5,6 +5,7 @@ from .stringalg import (
     lcp_query,
     levenshtein,
     most_frequent_substrings,
+    min_rotation,
 )
 from .wonderstring import WonderString, common_substrings
 
@@ -21,4 +22,5 @@ __all__ = [
     "most_frequent_substrings",
     "WonderString",
     "common_substrings",
+    "min_rotation",
 ]

@@ -45,7 +45,7 @@ A nicer interface to reuse computations lazily is provided in WonderString but c
 - `levenshtein(string1, string2)`: Levenshtein distance
 - `most_frequent_substrings(lcp, length, limit=0, minimum_count=1)`: most frequent substrings. See the docstring for details.
 - `common_substrings(string1, string2, limit=25)`: common substrings between two strings.
-
+- `min_rotation(string)`: minimum rotation of a string
 
 ### Example usage
 

@@ -99,3 +99,8 @@ def all_common_substrings(s1, s2):
                 ans[i + k, j + k] = max(ans[i + k, j + k], k)
 
     return sorted((i - k, j - k, k) for (i, j), k in ans.items())
+
+
+def min_rotation(s):
+    s = list(s)
+    return min(range(len(s)), key=lambda i: s[i:] + s[:i])

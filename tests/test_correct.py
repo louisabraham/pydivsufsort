@@ -15,6 +15,7 @@ from pydivsufsort import (
     levenshtein,
     most_frequent_substrings,
     common_substrings,
+    min_rotation,
 )
 from pydivsufsort.divsufsort import _SUPPORTED_DTYPES, _minimize_dtype
 
@@ -24,6 +25,7 @@ from reference import (
     BWT,
     iBWT,
     all_common_substrings,
+    min_rotation as min_rotation_ref,
 )
 
 
@@ -71,6 +73,9 @@ def assert_correct(inp, queries=None):
         tr_naive = iBWT(*bwt_naive)
         assert (tr_opt == cast_to_np_array(inp)).all(), inp
         assert (tr_opt == tr_naive).all(), inp
+
+    if len(inp) < 100:
+        assert min_rotation(inp) == min_rotation_ref(inp)
 
 
 def randint_type(size, dtype):
