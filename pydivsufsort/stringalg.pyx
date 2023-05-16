@@ -46,7 +46,7 @@ TODO: reuse rank array for kasai and lcp_segtree
 
 def _kasai(string_t[::1] s not None, sa_t[::1] sa not None):
 
-    cdef sa_t i, j, n, k
+    cdef ull i, j, n, k
     cdef np.ndarray[sa_t, ndim=1] lcp = np.empty_like(sa) 
     cdef np.ndarray[sa_t, ndim=1] rank = np.empty_like(sa)
         
@@ -77,7 +77,7 @@ def _kasai_bytes(const unsigned char[::1] s not None, sa_t[::1] sa not None):
     <https://github.com/pandas-dev/pandas/issues/31710>
     """
         
-    cdef sa_t i, j, n, k
+    cdef ull i, j, n, k
     cdef np.ndarray[sa_t, ndim=1] lcp = np.empty_like(sa) 
     cdef np.ndarray[sa_t, ndim=1] rank = np.empty_like(sa)
         
@@ -114,7 +114,7 @@ def _lcp_segtree(
         np.ndarray[sa_t, ndim=1] lcp not None
     ):
 
-    cdef sa_t i, j, n, k
+    cdef ull i, j, n, k
     
     cdef np.ndarray[sa_t, ndim=1] segtree = np.concatenate([np.empty_like(lcp), lcp])
     cdef np.ndarray rank = np.empty_like(sa)
@@ -150,7 +150,7 @@ def _lcp_query(
 
     # note: l and r could hold 2*n-1
     # fortunately, n is at most int64
-    cdef unsigned long long l, r
+    cdef ull l, r
 
     n = len(rank)
     q = len(queries)
@@ -185,7 +185,7 @@ def lcp_query(segtree, queries):
     return _lcp_query(*segtree, queries)
 
 def _levenshtein(string_t[::1] a not None, string_t[::1] b not None):
-    cdef unsigned long long n, m, i, j, d
+    cdef ull n, m, i, j, d
     n = len(a)
     m = len(b)
     cdef np.ndarray[np.uint64_t, ndim=2] temp = np.empty((n+1, m+1), dtype=np.uint64)
@@ -254,7 +254,7 @@ def most_frequent_substrings(
     # TODO: test
     # TODO: clean <https://stackoverflow.com/q/61176636/5133167>
 
-    cdef sa_t n, i, cur, cur_count, last    
+    cdef ull n, i, cur, cur_count, last    
     cdef vector[pair[sa_t, sa_t]] count
     
     if minimum_count < 1:
@@ -336,7 +336,7 @@ def _common_substrings(np.ndarray[ull, ndim=1] suffix_array, ull[::1] lcp, ull l
     ranges = repeated_substrings(suffix_array, lcp)
     # origin_cumsum can be use to check faster that
     # a range contains only suffixes from s1 or s2
-    origin = suffix_array < len1
+    cdef char [::1] origin = suffix_array < len1
     cdef np.ndarray[ull, ndim=1] origin_cumsum = np.empty(n + 1, dtype=np.uint64)
     origin_cumsum[0] = 0
     origin_cumsum[1:] = np.cumsum(origin)
@@ -344,7 +344,7 @@ def _common_substrings(np.ndarray[ull, ndim=1] suffix_array, ull[::1] lcp, ull l
     cdef cpp_map[pair[ull, ull], ull] ans
     cdef vector[np.uint64_t] start1, start2
     ranges.sort(key=lambda x: x[2]) # sort to avoid membership test
-    cdef ull start, end, length, diff
+    cdef ull start, end, length, diff, i, j, l
     for start, end, length in ranges:
         if length < limit:
             continue
@@ -389,11 +389,12 @@ cdef inline ull _clip(ull x, ull n):
 def _min_rotation(string_t[::1] s):
     cdef ull a = 0
     cdef ull n = len(s)
-    b = 0
+    cdef ull b = 0, i
     while b < n:
         for i in range(n):
             if a + i == b or s[_clip(a + i, n)] < s[_clip(b + i, n)]:
-                b += max(0, i - 1)
+                if i > 1:
+                    b += i - 1
                 break
             if s[_clip(a + i, n)] > s[_clip(b + i, n)]:
                 a = b
@@ -405,17 +406,19 @@ def _min_rotation(string_t[::1] s):
 def _min_rotation_bytes(const unsigned char[::1] s):
     cdef ull a = 0
     cdef ull n = len(s)
-    b = 0
+    cdef ull b = 0, i
     while b < n:
         for i in range(n):
             if a + i == b or s[_clip(a + i, n)] < s[_clip(b + i, n)]:
-                b += max(0, i - 1)
+                if i > 1:
+                    b += i - 1
                 break
             if s[_clip(a + i, n)] > s[_clip(b + i, n)]:
                 a = b
                 break
         b += 1
     return a
+
 
 
 def min_rotation(s):
