@@ -108,7 +108,7 @@ jobs:
             - name: Build Wheels
               env:
                   CIBW_BEFORE_BUILD: bash ./cibw_before_build.sh
-                  CIBW_SKIP: pp* *-win_amd64
+                  CIBW_SKIP: pp* *-win_amd64 cp312-*
                   CIBW_ENVIRONMENT: PLATFORM_OPTION='-A win32'
                   CIBW_BUILD_VERBOSITY: 1
                   CIBW_TEST_REQUIRES: pytest
@@ -146,7 +146,7 @@ jobs:
             - name: Build Wheels
               env:
                   CIBW_BEFORE_BUILD: bash ./cibw_before_build.sh
-                  CIBW_SKIP: pp* *-win32
+                  CIBW_SKIP: pp* *-win32 cp312-*
                   CIBW_ENVIRONMENT: PLATFORM_OPTION='-A x64'
                   CIBW_BUILD_VERBOSITY: 1
                   CIBW_TEST_REQUIRES: pytest
