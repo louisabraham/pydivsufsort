@@ -65,7 +65,7 @@ jobs:
               shell: bash
             - name: Build Wheels
               env:
-                  CIBW_BEFORE_BUILD: bash ./cibw_before_build.sh
+                  CIBW_BEFORE_BUILD: bash ./cibw_before_build.sh && pip install -U pip
                   CIBW_SKIP: pp* *-musllinux_*
                   CIBW_BUILD_VERBOSITY: 1
                   CIBW_TEST_REQUIRES: pytest
