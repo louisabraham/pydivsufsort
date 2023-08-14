@@ -22,7 +22,7 @@ if PROFILE:
     directive_defaults["binding"] = True
 
 
-# make  the wheel platform specific
+# make the wheel platform specific
 # https://stackoverflow.com/a/45150383
 try:
     from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
