@@ -50,7 +50,7 @@ jobs:
             - name: Set Up Python
               uses: actions/setup-python@v4
               with:
-                  python-version: '3.x'
+                  python-version: "3.x"
             - name: Install build and pip
               run: python -m pip install -U pip build
               shell: bash
@@ -70,6 +70,7 @@ jobs:
                   CIBW_BUILD_VERBOSITY: 1
                   CIBW_TEST_REQUIRES: pytest
                   CIBW_TEST_COMMAND: "pytest {project}/tests"
+                  CIBW_ARCHS_MACOS: x86_64 arm64
               run: |
                   python -m cibuildwheel --output-dir wheelhouse
                   ls wheelhouse/*
@@ -100,7 +101,7 @@ jobs:
             - name: Set Up Python
               uses: actions/setup-python@v4
               with:
-                  python-version: '3.x'
+                  python-version: "3.x"
             - name: Install Cibuildwheel
               run: python -m pip install cibuildwheel
               shell: bash
@@ -138,7 +139,7 @@ jobs:
             - name: Set Up Python
               uses: actions/setup-python@v4
               with:
-                  python-version: '3.x'
+                  python-version: "3.x"
             - name: Install Cibuildwheel
               run: python -m pip install cibuildwheel
               shell: bash
