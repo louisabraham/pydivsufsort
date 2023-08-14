@@ -2,16 +2,15 @@
 
 
 import os
-from pathlib import Path
 import platform
-from subprocess import Popen
-from setuptools import setup
-from setuptools import Extension
 from distutils.command.build import build as _build
 from distutils.command.install import install as _install
-from Cython.Build import cythonize
+from pathlib import Path
+from subprocess import Popen
 
 import numpy
+from Cython.Build import cythonize
+from setuptools import Extension, setup
 
 PROFILE = os.environ.get("PROFILE", False)
 
@@ -101,3 +100,4 @@ setup(
     classifiers=[],
     cmdclass={"build": build, "bdist_wheel": bdist_wheel, "install": install},
 )
+
