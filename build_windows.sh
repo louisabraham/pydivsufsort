@@ -4,13 +4,9 @@ git submodule update
 mkdir tempbuild
 cd tempbuild
 cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF -DUSE_OPENMP=ON $PLATFORM_OPTION ../libdivsufsort
-if [ "$RUNNER_OS" == "Windows" ]; then
-    cmake --build . --config Release
-    OUTPATH="tempbuild/examples/Release/divsufsort"
-else
-    make
-    OUTPATH="tempbuild/lib/libdivsufsort"
-fi
+
+cmake --build . --config Release
+OUTPATH="tempbuild/examples/Release/divsufsort"
 
 cd ..
 

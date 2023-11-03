@@ -40,11 +40,11 @@ class build(_build):
     def run(self):
         if platform.system() == "Windows":
             witness = Path(__file__).parent / "pydivsufsort/divsufsort.dll"
-            assert witness.exists(), "Launch ./build.sh first"
-        elif platform.system() == "Darwin" and platform.machine() == "x86_64":
+            assert witness.exists(), "Launch ./build_windows.sh first"
+        elif platform.system() == "Darwin":
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
-            Popen(["arch", "-x86_64", path], shell=False).wait()
+            Popen(["arch", "-" + platform.machine(), path], shell=False).wait()
         else:
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
@@ -74,7 +74,7 @@ extensions = [
 
 setup(
     name="pydivsufsort",
-    version="0.0.11",
+    version="0.0.12",
     author="Louis Abraham",
     license="MIT",
     author_email="louis.abraham@yahoo.fr",
