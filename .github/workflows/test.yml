@@ -28,11 +28,10 @@ jobs:
               shell: bash
             - name: Install Pydivsufsort And Other Dependencies
               run: |
+                  bash ./build.sh
                   python -m pip install pytest flake8 coverage
                   # -e installs locally, else coverage fails                  
                   python -m pip install -v -e .
-                  # -e does not build
-                  python setup.py build
               shell: bash
             - name: Run Flake8
               run: flake8 .
