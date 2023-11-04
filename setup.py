@@ -39,7 +39,7 @@ class build(_build):
     def run(self):
         if platform.system() == "Windows":
             witness = Path(__file__).parent / "pydivsufsort/divsufsort.dll"
-            assert witness.exists(), "Launch ./build_windows.sh first"
+            assert witness.exists(), "Launch ./build.sh first"
         elif platform.system() == "Darwin":
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
