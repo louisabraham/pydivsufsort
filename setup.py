@@ -45,7 +45,7 @@ class build(_build):
         elif platform.system() == "Darwin":
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
-            mach = sysconfig.machine()
+            mach = sysconfig.get_platform()
             if mach.endswith("x86_64"):
                 arch = "-x86_64"
             elif mach.endswith("arm64"):
