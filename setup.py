@@ -51,7 +51,8 @@ class build(_build):
             elif mach.endswith("arm64"):
                 arch = "-arm64"
             else:
-                raise ValueError(f"Unknown machine {mach}")
+                # support universal2
+                arch = "-" + platform.machine()
             Popen(["arch", arch, path], shell=False).wait()
         else:
             script = Path(__file__).parent / "build.sh"
