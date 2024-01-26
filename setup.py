@@ -7,6 +7,7 @@ from distutils.command.build import build as _build
 from distutils.command.install import install as _install
 from pathlib import Path
 from subprocess import Popen
+import sysconfig
 
 import numpy
 from Cython.Build import cythonize
@@ -44,7 +45,14 @@ class build(_build):
         elif platform.system() == "Darwin":
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
-            Popen(["arch", "-" + platform.machine(), path], shell=False).wait()
+            mach = sysconfig.machine()
+            if mach.endswith("x86_64"):
+                arch = "-x86_64"
+            elif mach.endswith("arm64"):
+                arch = "-arm64"
+            else:
+                raise ValueError(f"Unknown machine {mach}")
+            Popen(["arch", arch, path], shell=False).wait()
         else:
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
@@ -74,7 +82,7 @@ extensions = [
 
 setup(
     name="pydivsufsort",
-    version="0.0.12",
+    version="0.0.13",
     author="Louis Abraham",
     license="MIT",
     author_email="louis.abraham@yahoo.fr",
