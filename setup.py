@@ -46,6 +46,7 @@ class build(_build):
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
             mach = sysconfig.get_platform()
+            print("Building for", mach, platform.machine())
             if mach.endswith("x86_64"):
                 arch = "-x86_64"
             elif mach.endswith("arm64"):
