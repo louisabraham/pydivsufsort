@@ -1,5 +1,4 @@
 # cython: language_level=3, wraparound=False, boundscheck=False
-# distutils: extra_compile_args=-O3
 
 cimport numpy as np
 import numpy as np
