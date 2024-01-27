@@ -200,7 +200,7 @@ def test_common_substrings():
 
 
 def test_warnings_errors():
-    with pytest.warns(None):
+    with pytest.warns(UserWarning):
         divsufsort("a" * 1000)
     import ctypes
 
@@ -208,7 +208,7 @@ def test_warnings_errors():
 
     s = (ctypes.c_char * 6)()
     s[:] = b"banana"
-    with pytest.warns(None):
+    with pytest.warns(UserWarning):
         assert np.alltrue(divsufsort(s) == np.array([5, 3, 1, 0, 4, 2]))
 
     with pytest.raises(TypeError):
