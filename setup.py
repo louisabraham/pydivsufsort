@@ -3,8 +3,7 @@
 
 import os
 import platform
-from distutils.command.build import build as _build
-from distutils.command.install import install as _install
+from setuptools.command.build_py import build_py
 from pathlib import Path
 from subprocess import Popen
 import sysconfig
@@ -37,7 +36,7 @@ except ImportError:
     bdist_wheel = None
 
 
-class build(_build):
+class CustomBuildPy(build_py):
     def run(self):
         if platform.system() == "Windows":
             witness = Path(__file__).parent / "pydivsufsort/divsufsort.dll"
@@ -48,23 +47,24 @@ class build(_build):
             mach = sysconfig.get_platform()
             print("Building for", mach, platform.machine())
             if mach.endswith("x86_64"):
-                arch = "-x86_64"
+                arch = "x86_64"
             elif mach.endswith("arm64"):
-                arch = "-arm64"
+                arch = "arm64"
             else:
                 # support universal2
-                arch = "-" + platform.machine()
-            Popen(["arch", arch, path], shell=False).wait()
+                arch = platform.machine()
+            Popen(
+                [path],
+                shell=False,
+                env={
+                    **os.environ,
+                    "PLATFORM_OPTION": "-DCMAKE_OSX_ARCHITECTURES=" + arch,
+                },
+            ).wait()
         else:
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
             Popen([path], shell=True, executable="/bin/bash").wait()
-        super().run()
-
-
-# idk why this is required for build to execute
-class install(_install):
-    def run(self):
         super().run()
 
 
@@ -108,5 +108,5 @@ setup(
     install_requires=["wheel", "numpy"],
     tests_require=["pytest"],
     classifiers=[],
-    cmdclass={"build": build, "bdist_wheel": bdist_wheel, "install": install},
+    cmdclass={"build_py": CustomBuildPy, "bdist_wheel": bdist_wheel},
 )
