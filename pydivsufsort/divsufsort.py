@@ -72,12 +72,14 @@ def _get_bytes_pointer(inp):
         try:
             ans = inp.encode("ascii")
             if len(inp) > 999:
-                warnings.warn("converting str argument uses more memory")
+                warnings.warn("converting str argument uses more memory", stacklevel=2)
             return ans
         except UnicodeEncodeError:
             raise TypeError("str must only contain ascii chars")
     else:
-        warnings.warn("input type not recognized, handled as a buffer of char")
+        warnings.warn(
+            "input type not recognized, handled as a buffer of char", stacklevel=2
+        )
         return _pointer_frombuffer(inp)
 
 
