@@ -209,7 +209,7 @@ def test_warnings_errors():
     s = (ctypes.c_char * 6)()
     s[:] = b"banana"
     with pytest.warns(UserWarning):
-        assert np.alltrue(divsufsort(s) == np.array([5, 3, 1, 0, 4, 2]))
+        assert np.all(divsufsort(s) == np.array([5, 3, 1, 0, 4, 2]))
 
     with pytest.raises(TypeError):
         divsufsort("é")

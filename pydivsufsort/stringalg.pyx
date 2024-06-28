@@ -3,6 +3,8 @@
 cimport numpy as np
 import numpy as np
 
+np.import_array()
+
 import warnings
 from .divsufsort import divsufsort 
 
