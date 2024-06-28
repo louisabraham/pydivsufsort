@@ -84,7 +84,6 @@ extensions = [
 
 setup(
     name="pydivsufsort",
-    version="0.0.15",
     author="Louis Abraham",
     license="MIT",
     author_email="louis.abraham@yahoo.fr",
@@ -104,7 +103,7 @@ setup(
         ]
     },
     ext_modules=cythonize(extensions),
-    python_requires=">=3.6",
+    python_requires=">=3.9",
     install_requires=["wheel", "numpy"],
     tests_require=["pytest"],
     classifiers=[],
