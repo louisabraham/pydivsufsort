@@ -33,6 +33,9 @@ jobs:
           # -e installs locally, else coverage fails                  
           python -m pip install -v -e .
         shell: bash
+      - name: Display NumPy Version
+        run: python -c "import numpy; print(numpy.__version__)"
+        shell: bash
       - name: Run Flake8
         run: flake8 .
         shell: bash
