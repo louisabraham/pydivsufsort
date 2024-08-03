@@ -47,8 +47,8 @@ A nicer interface to reuse computations lazily is provided in WonderString but c
 - `common_substrings(string1, string2, limit=25)`: common substrings between two strings.
 - `min_rotation(string)`: minimum rotation of a string
 - `longest_previous_factor(string, suffix_array=None, lcp=None)`: longest previous factor array (used in the Lempel-Ziv factorization)
-- `lempel_zif_factorization(lpf, complexity: bool = False)`: Lempel-Ziv factorization
-- `lempel_zif_complexity(string, suffix_array=None, lcp=None)`: Lempel-Ziv complexity
+- `lempel_ziv_factorization(lpf, complexity: bool = False)`: Lempel-Ziv factorization
+- `lempel_ziv_complexity(string, suffix_array=None, lcp=None)`: Lempel-Ziv complexity
 
 
 ### Example usage

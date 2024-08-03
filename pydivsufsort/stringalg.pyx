@@ -479,7 +479,7 @@ def longest_previous_factor(s, sa=None, lcp=None):
     return _longest_previous_factor(s, sa, lcp)
 
 
-def lempel_zif_factorization(np.ndarray[sa_t, ndim=1] lpf not None, bool complexity=False):
+def lempel_ziv_factorization(np.ndarray[sa_t, ndim=1] lpf not None, bool complexity=False):
     cdef ull i, n
     cdef list lz = [<sa_t>0]
 
@@ -492,16 +492,16 @@ def lempel_zif_factorization(np.ndarray[sa_t, ndim=1] lpf not None, bool complex
     return lz
 
 
-def _lempel_zif_complexity(
+def _lempel_ziv_complexity(
         string_t[::1] s not None,
         np.ndarray[sa_t, ndim=1] sa not None,
         np.ndarray[sa_t, ndim=1] lcp not None
     ):
     lpf = longest_previous_factor(s, sa, lcp)
-    return len(lempel_zif_factorization(lpf, True)) - 1
+    return len(lempel_ziv_factorization(lpf, True)) - 1
 
 
-def lempel_zif_complexity(s, sa=None, lcp=None):
+def lempel_ziv_complexity(s, sa=None, lcp=None):
     s = handle_input(s)
     if sa is None:
         sa = divsufsort(s)
@@ -510,4 +510,4 @@ def lempel_zif_complexity(s, sa=None, lcp=None):
     if isinstance(s, bytes):
         # tofix
         s = bytearray(s)
-    return _lempel_zif_complexity(s, sa, lcp)
+    return _lempel_ziv_complexity(s, sa, lcp)

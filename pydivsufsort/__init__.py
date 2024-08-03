@@ -7,8 +7,8 @@ from .stringalg import (
     most_frequent_substrings,
     min_rotation,
     longest_previous_factor,
-    lempel_zif_factorization,
-    lempel_zif_complexity,
+    lempel_ziv_factorization,
+    lempel_ziv_complexity,
 )
 from .wonderstring import WonderString, common_substrings
 
@@ -27,6 +27,6 @@ __all__ = [
     "common_substrings",
     "min_rotation",
     "longest_previous_factor",
-    "lempel_zif_factorization",
-    "lempel_zif_complexity",
+    "lempel_ziv_factorization",
+    "lempel_ziv_complexity",
 ]
