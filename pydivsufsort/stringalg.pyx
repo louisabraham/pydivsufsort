@@ -215,6 +215,7 @@ from libcpp.pair cimport pair
 from libcpp.vector cimport vector
 from libcpp.map cimport map as cpp_map
 from libcpp.algorithm cimport sort
+from libcpp cimport bool
 
 # TODO: in Cython 0.30 reverse can be imported from libcpp.algorithm
 cdef extern from "<algorithm>" namespace "std" nogil:
@@ -236,7 +237,7 @@ def most_frequent_substrings(
     ----------
 
     lcp : np.ndarray
-        LCP array
+        lcp array
     length : int
         length of the substrings to compare
     limit : int (default 0)
@@ -300,7 +301,7 @@ cpdef repeated_substrings(ull[::1] suffix_array, ull[::1] lcp):
     suffix_array : np.ndarray
         suffix array
     lcp : np.ndarray
-        LCP array
+        lcp array
     
     Returns
     -------
@@ -421,9 +422,92 @@ def _min_rotation_bytes(const unsigned char[::1] s):
     return a
 
 
-
 def min_rotation(s):
     s = handle_input(s)
     if isinstance(s, bytes):
         return _min_rotation_bytes(s)
     return _min_rotation(s)
+
+
+def _longest_previous_factor(
+        string_t[::1] s not None,
+        np.ndarray[sa_t, ndim=1] sa not None,
+        np.ndarray[sa_t, ndim=1] lcp not None
+    ):
+    """
+    Crochemore, Maxime, Lucian Ilie, and William F. Smyth.
+    "A simple algorithm for computing the Lempel Ziv factorization."
+    Data Compression Conference (DCC 2008). IEEE, 2008.
+    """
+    cdef ull n, i
+    n = len(sa)
+    
+    sa = np.concatenate([sa, np.array([-1], dtype=sa.dtype)])
+    lcp = np.concatenate([np.array([0], dtype=sa.dtype), lcp])
+    
+    cdef vector[sa_t] stack = [0]
+    cdef np.ndarray[sa_t, ndim=1] lpf = np.empty(n, dtype=sa.dtype) 
+
+
+    for i in range(1, n + 1):
+        while stack.size() > 0 and (
+            (sa[i] < sa[stack.back()]) or
+            ((sa[i] > sa[stack.back()]) and (lcp[i] <= lcp[stack.back()]))
+        ):
+            if sa[i] < sa[stack.back()]:
+                lpf[sa[stack.back()]] = max(lcp[stack.back()], lcp[i])
+                lcp[i] = min(lcp[stack.back()], lcp[i])
+            else:
+                lpf[sa[stack.back()]] = lcp[stack.back()]
+            stack.pop_back()
+        
+        if i < n:
+            stack.push_back(i)
+    
+    return lpf
+
+
+def longest_previous_factor(s, sa=None, lcp=None):
+    s = handle_input(s)
+    if sa is None:
+        sa = divsufsort(s)
+    if lcp is None:
+        lcp = kasai(s, sa)
+    if isinstance(s, bytes):
+        # tofix
+        s = bytearray(s)
+    return _longest_previous_factor(s, sa, lcp)
+
+
+def lempel_zif_factorization(np.ndarray[sa_t, ndim=1] lpf not None, bool complexity=False):
+    cdef ull i, n
+    cdef list lz = [<sa_t>0]
+
+    n = len(lpf)
+    i = 0
+    while lz[i] < n:
+        lz.append(lz[i] + max(1, lpf[lz[i]] + <sa_t>complexity))
+        i += 1
+
+    return lz
+
+
+def _lempel_zif_complexity(
+        string_t[::1] s not None,
+        np.ndarray[sa_t, ndim=1] sa not None,
+        np.ndarray[sa_t, ndim=1] lcp not None
+    ):
+    lpf = longest_previous_factor(s, sa, lcp)
+    return len(lempel_zif_factorization(lpf, True)) - 1
+
+
+def lempel_zif_complexity(s, sa=None, lcp=None):
+    s = handle_input(s)
+    if sa is None:
+        sa = divsufsort(s)
+    if lcp is None:
+        lcp = kasai(s, sa)
+    if isinstance(s, bytes):
+        # tofix
+        s = bytearray(s)
+    return _lempel_zif_complexity(s, sa, lcp)

@@ -6,6 +6,9 @@ from .stringalg import (
     levenshtein,
     most_frequent_substrings,
     min_rotation,
+    longest_previous_factor,
+    lempel_zif_factorization,
+    lempel_zif_complexity,
 )
 from .wonderstring import WonderString, common_substrings
 
@@ -23,4 +26,7 @@ __all__ = [
     "WonderString",
     "common_substrings",
     "min_rotation",
+    "longest_previous_factor",
+    "lempel_zif_factorization",
+    "lempel_zif_complexity",
 ]

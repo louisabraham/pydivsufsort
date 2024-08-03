@@ -16,6 +16,9 @@ from pydivsufsort import (
     most_frequent_substrings,
     common_substrings,
     min_rotation,
+    longest_previous_factor,
+    lempel_zif_factorization,
+    lempel_zif_complexity,
 )
 from pydivsufsort.divsufsort import _SUPPORTED_DTYPES, _minimize_dtype
 
@@ -233,3 +236,27 @@ def test64():
 
     res = sa_search(s, sa, "an")
     assert res == (2, 1)
+
+
+def test_lpf():
+    s = "abbaabbbaaabab"
+    lpf = longest_previous_factor(s)
+    assert (lpf == np.array([0, 0, 1, 1, 3, 2, 4, 3, 2, 3, 2, 2, 2, 1])).all()
+
+
+def test_lz():
+    s = "abbaabbbaaabab"
+    lz = lempel_zif_factorization(longest_previous_factor(s))
+    # a b b a abb baa ab ab
+    assert lz == [0, 1, 2, 3, 4, 7, 10, 12, 14]
+
+    s = "1001111011000010"
+    lz = lempel_zif_factorization(longest_previous_factor(s))
+    # 1 0 0 1 111 011 00 001 0
+    assert lz == [0, 1, 2, 3, 4, 7, 10, 12, 15, 16]
+    # 1 0 01 1110 1100 0010
+    assert lempel_zif_complexity("1001111011000010") == 6
+
+    assert lempel_zif_complexity("") == 0
+    assert lempel_zif_complexity("0001") == 2
+    assert lempel_zif_complexity("010") == 3
