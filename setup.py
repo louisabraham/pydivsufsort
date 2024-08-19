@@ -3,14 +3,14 @@
 
 import os
 import platform
-from setuptools.command.build_py import build_py
-from pathlib import Path
-from subprocess import Popen
+import subprocess
 import sysconfig
+from pathlib import Path
 
 import numpy
 from Cython.Build import cythonize
 from setuptools import Extension, setup
+from setuptools.command.build_py import build_py
 
 PROFILE = os.environ.get("PROFILE", False)
 
@@ -53,18 +53,18 @@ class CustomBuildPy(build_py):
             else:
                 # support universal2
                 arch = platform.machine()
-            Popen(
+            subprocess.check_call(
                 [path],
                 shell=False,
                 env={
                     **os.environ,
                     "PLATFORM_OPTION": "-DCMAKE_OSX_ARCHITECTURES=" + arch,
                 },
-            ).wait()
+            )
         else:
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
-            Popen([path], shell=True, executable="/bin/bash").wait()
+            subprocess.check_call([path], shell=True, executable="/bin/bash")
         super().run()
 
 
