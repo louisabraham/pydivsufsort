@@ -3,33 +3,28 @@ import random
 
 import numpy as np
 import pytest
+from reference import BWT, all_common_substrings, iBWT, longest_common_prefix
+from reference import min_rotation as min_rotation_ref
+from reference import suffix_array
 
 from pydivsufsort import (
-    divsufsort,
-    kasai,
-    lcp_segtree,
-    lcp_query,
     bw_transform,
-    inverse_bw_transform,
-    sa_search,
-    levenshtein,
-    most_frequent_substrings,
     common_substrings,
-    min_rotation,
-    longest_previous_factor,
-    lempel_ziv_factorization,
+    divsufsort,
+    inverse_bw_transform,
+    kasai,
+    kmp_censor_stream,
+    lcp_query,
+    lcp_segtree,
     lempel_ziv_complexity,
+    lempel_ziv_factorization,
+    levenshtein,
+    longest_previous_factor,
+    min_rotation,
+    most_frequent_substrings,
+    sa_search,
 )
 from pydivsufsort.divsufsort import _SUPPORTED_DTYPES, _minimize_dtype
-
-from reference import (
-    suffix_array,
-    longest_common_prefix,
-    BWT,
-    iBWT,
-    all_common_substrings,
-    min_rotation as min_rotation_ref,
-)
 
 
 def cast_to_array(inp):
@@ -260,3 +255,16 @@ def test_lz():
     assert lempel_ziv_complexity("") == 0
     assert lempel_ziv_complexity("0001") == 2
     assert lempel_ziv_complexity("010") == 3
+
+
+def test_kmp_censor_stream():
+    assert list(kmp_censor_stream("an", "banana")) == ["b", "a"]
+    assert list(kmp_censor_stream("an", ["ba", "na", "na"])) == ["b", "a"]
+    assert list(kmp_censor_stream("nan", "banana")) == ["b", "a", "a"]
+    assert list(kmp_censor_stream("nan", "bananana")) == ["b", "a", "a"]
+
+    out = list(kmp_censor_stream("a", ["ba", "naba", "na"]))
+    assert len(out) == 3
+    assert "".join(out) == "bnbn"
+
+    out = list(kmp_censor_stream("a", "bonne journée"))

@@ -1,17 +1,17 @@
-from .divsufsort import divsufsort, bw_transform, inverse_bw_transform, sa_search
+from .divsufsort import bw_transform, divsufsort, inverse_bw_transform, sa_search
 from .stringalg import (
     kasai,
-    lcp_segtree,
+    kmp_censor_stream,
     lcp_query,
-    levenshtein,
-    most_frequent_substrings,
-    min_rotation,
-    longest_previous_factor,
-    lempel_ziv_factorization,
+    lcp_segtree,
     lempel_ziv_complexity,
+    lempel_ziv_factorization,
+    levenshtein,
+    longest_previous_factor,
+    min_rotation,
+    most_frequent_substrings,
 )
 from .wonderstring import WonderString, common_substrings
-
 
 __all__ = [
     "divsufsort",
@@ -29,4 +29,5 @@ __all__ = [
     "longest_previous_factor",
     "lempel_ziv_factorization",
     "lempel_ziv_complexity",
+    "kmp_censor_stream",
 ]

@@ -511,3 +511,57 @@ def lempel_ziv_complexity(s, sa=None, lcp=None):
         # tofix
         s = bytearray(s)
     return _lempel_ziv_complexity(s, sa, lcp)
+
+
+cdef vector[ull] _prefix_function(const unsigned char[::1] s):
+    cdef ull n = len(s)
+    cdef vector[ull] pi = vector[ull](n)
+    cdef ull i, j = 0
+    for i in range(1, n):
+        while j > 0 and s[i] != s[j]:
+            j = pi[j - 1]
+        j += s[i] == s[j]
+        pi[i] = j
+    return pi
+
+from libcpp.deque cimport deque
+
+def kmp_censor_stream(censor, stream):
+    """
+    Uses KMP algorithm to censor text from a stream of str.
+    """
+    censor = censor.encode("utf-8")
+    cdef vector[ull] pi = _prefix_function(censor)
+    cdef deque[unsigned char] buffer
+    cdef bytearray out
+    cdef ull j = 0
+    cdef unsigned char c
+    cdef bytes bytes_s
+
+    for s in stream:
+        bytes_s = s.encode("utf-8")
+        out = bytearray()
+
+        for c in bytes_s:
+            buffer.push_back(c)
+            while j > 0 and c != censor[j]:
+                j = pi[j - 1]
+            j += c == censor[j]
+            
+            if j == len(censor):
+                buffer.clear()
+                j = pi[j - 1]
+
+            for i in range(int(buffer.size()) - j):
+                out.append(buffer.front())
+                buffer.pop_front()
+
+        if out:
+            yield out.decode("utf-8")
+
+    out = bytearray()
+    while not buffer.empty():
+        out.append(buffer.front())
+        buffer.pop_front()
+    if out:
+        yield out.decode("utf-8")

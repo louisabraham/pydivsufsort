@@ -49,7 +49,7 @@ A nicer interface to reuse computations lazily is provided in WonderString but c
 - `longest_previous_factor(string, suffix_array=None, lcp=None)`: longest previous factor array (used in the Lempel-Ziv factorization)
 - `lempel_ziv_factorization(lpf, complexity: bool = False)`: Lempel-Ziv factorization
 - `lempel_ziv_complexity(string, suffix_array=None, lcp=None)`: Lempel-Ziv complexity
-
+- `kmp_censor_stream(censor, string)`: Censor a stream (like a generator of string) using the KMP algorithm
 
 ### Example usage
 
