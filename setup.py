@@ -39,8 +39,15 @@ except ImportError:
 class CustomBuildPy(build_py):
     def run(self):
         if platform.system() == "Windows":
-            witness = Path(__file__).parent / "pydivsufsort/divsufsort.dll"
-            assert witness.exists(), "Launch ./build.sh first"
+            script = Path(__file__).parent / "build.sh"
+            path = script.absolute().as_posix()
+            try:
+                subprocess.check_call(f"bash {path}", shell=True)
+            except subprocess.CalledProcessError as e:
+                print(f"Error running build script: {e}")
+                raise
+            # witness = Path(__file__).parent / "pydivsufsort/divsufsort.dll"
+            # assert witness.exists(), "Launch ./build.sh first"
         elif platform.system() == "Darwin":
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()
