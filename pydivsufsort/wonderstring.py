@@ -1,13 +1,14 @@
-import numpy as np
 from collections import namedtuple
+
+import numpy as np
 
 from . import (
     divsufsort,
-    sa_search,
     kasai,
-    lcp_segtree,
     lcp_query,
+    lcp_segtree,
     most_frequent_substrings,
+    sa_search,
 )
 from .stringalg import _common_substrings
 
@@ -63,11 +64,20 @@ class WonderString:
 
     def search(self, pattern, return_positions=False):
         if self.itemsize != 1:
-            raise NotImplementedError(
-                "Not supported for non byte strings.\n"
-                "Please raise an issue on "
-                "<https://github.com/louisabraham/pydivsufsort/issues>"
-            )
+            if not return_positions:
+                raise NotImplementedError(
+                    "For non-byte strings, we only support return_positions=True."
+                )
+
+            pattern = cast_to_numpy(pattern)
+            assert (
+                pattern.dtype == self.string.dtype
+            ), "pattern must have the same dtype as the string"
+            pattern = pattern.view("uint8")
+            count, position = sa_search(self.bytes, self.suffix_array_bytes, pattern)
+            positions = self.suffix_array_bytes[position : position + count]
+            positions = positions[positions % self.itemsize == 0] // self.itemsize
+            return positions
 
         ans = SearchResult(*sa_search(self.string, self.suffix_array, pattern))
 

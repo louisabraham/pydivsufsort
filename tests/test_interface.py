@@ -1,6 +1,7 @@
 import numpy as np
-from pydivsufsort import WonderString
 import pytest
+
+from pydivsufsort import WonderString
 
 
 def test_base():
@@ -25,3 +26,11 @@ def test_larger_dtype():
     a = np.array([0, 256, 0, 256], np.uint16)
     s = WonderString(a)
     assert s.lcp(0, 2) == 2
+    pat = np.array([0, 256], np.uint16)
+    ans = s.search(pat, return_positions=True)
+    assert sorted(ans) == [0, 2]
+    a = np.array([257, 257], np.uint16)
+    s = WonderString(a)
+    pat = np.array([257], np.uint16)
+    ans = s.search(pat, return_positions=True)
+    assert sorted(ans) == [0, 1]
