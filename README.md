@@ -150,4 +150,5 @@ If you have used this software in a scientific publication, please cite it using
   publisher    = {Zenodo},
   doi          = {10.5281/zenodo.7932458},
   howpublished = {\url{https://github.com/louisabraham/pydivsufsort}},
-}```
+}
+```
