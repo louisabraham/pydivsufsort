@@ -12,7 +12,7 @@ git submodule update
 rm -rf tempbuild
 mkdir tempbuild
 cd tempbuild
-cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF -DUSE_OPENMP=ON $PLATFORM_OPTION ../libdivsufsort
+cmake -DBUILD_DIVSUFSORT64=ON -DBUILD_EXAMPLES=OFF -DUSE_OPENMP=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 $PLATFORM_OPTION ../libdivsufsort
 
 # test if we are on Windows
 if [ -n "$WINDIR" ]; then
