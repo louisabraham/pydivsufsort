@@ -1,4 +1,5 @@
 #! /bin/bash
+set -e
 
 # doesn't work on Windows
 # we assume we always launch the script
