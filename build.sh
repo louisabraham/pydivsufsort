@@ -6,8 +6,10 @@ set -e
 # from its parent directory
 cd "${0%/*}"
 
-git submodule init
-git submodule update
+if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    git submodule init
+    git submodule update
+fi
 
 rm -rf tempbuild
 mkdir tempbuild
