@@ -17,7 +17,22 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        include:
+          # Linux native x86_64 (also builds sdist)
+          - os: ubuntu-latest
+            archs: x86_64
+            build: "*"
+            build_sdist: true
+          # Linux native aarch64
+          - os: ubuntu-24.04-arm
+            archs: aarch64
+            build: "*"
+            build_sdist: false
+          # macOS (cross-compilation)
+          - os: macos-latest
+            archs: x86_64 arm64
+            build: "*"
+            build_sdist: false
     steps:
       - name: Checkout Repository And Submodules
         uses: actions/checkout@v3
@@ -31,16 +46,9 @@ jobs:
         run: python -m pip install -U pip build
         shell: bash
       - name: Build Sdist
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            python -m build --sdist
-          fi
+        if: matrix.build_sdist
+        run: python -m build --sdist
         shell: bash
-      - name: Set up QEMU
-        if: runner.os == 'Linux'
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: all
       - name: Install Cibuildwheel
         run: python -m pip install cibuildwheel
         shell: bash
@@ -51,8 +59,8 @@ jobs:
           CIBW_BUILD_VERBOSITY: 1
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: "pytest {project}/tests"
-          CIBW_ARCHS_MACOS: x86_64 arm64
-          CIBW_ARCHS_LINUX: auto aarch64
+          CIBW_ARCHS: ${{ matrix.archs }}
+          CIBW_BUILD: ${{ matrix.build }}
         run: |
           python -m cibuildwheel --output-dir wheelhouse
           ls wheelhouse/*
@@ -63,18 +71,23 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
           python -m pip install twine
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            # Replace/remove echo
+          if [ "${{ matrix.build_sdist }}" == "true" ]; then
             python -m twine upload --skip-existing dist/*
           fi
           python -m twine upload --skip-existing wheelhouse/*.whl
         shell: bash
-  build_win32_wheels:
+  build_windows_wheels:
     needs: testing
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     strategy:
       matrix:
-        os: [windows-latest]
+        include:
+          - arch: win32
+            skip: "pp* *-win_amd64"
+            platform: "-A win32"
+          - arch: amd64
+            skip: "pp* *-win32"
+            platform: "-A x64"
     steps:
       - name: Checkout Repository And Submodules
         uses: actions/checkout@v3
@@ -90,46 +103,8 @@ jobs:
       - name: Build Wheels
         env:
           CIBW_BEFORE_BUILD: bash ./build.sh
-          CIBW_SKIP: pp* *-win_amd64
-          CIBW_ENVIRONMENT: PLATFORM_OPTION='-A win32'
-          CIBW_BUILD_VERBOSITY: 1
-          CIBW_TEST_REQUIRES: pytest
-          CIBW_TEST_COMMAND: "pytest {project}/tests"
-        run: |
-          python -m cibuildwheel --output-dir wheelhouse
-          ls wheelhouse/*
-        shell: bash
-      - name: Upload Builds
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          python -m pip install twine
-          python -m twine upload --skip-existing wheelhouse/*.whl
-        shell: bash
-  build_amd64_wheels:
-    needs: testing
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest]
-    steps:
-      - name: Checkout Repository And Submodules
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set Up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
-      - name: Install Cibuildwheel
-        run: python -m pip install cibuildwheel
-        shell: bash
-      - name: Build Wheels
-        env:
-          CIBW_BEFORE_BUILD: bash ./build.sh
-          CIBW_SKIP: pp* *-win32
-          CIBW_ENVIRONMENT: PLATFORM_OPTION='-A x64'
+          CIBW_SKIP: ${{ matrix.skip }}
+          CIBW_ENVIRONMENT: PLATFORM_OPTION='${{ matrix.platform }}'
           CIBW_BUILD_VERBOSITY: 1
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: "pytest {project}/tests"
@@ -146,7 +121,7 @@ jobs:
           python -m twine upload --skip-existing wheelhouse/*.whl
         shell: bash
   create_tag:
-    needs: [build_linux_macos_wheels, build_win32_wheels, build_amd64_wheels]
+    needs: [build_linux_macos_wheels, build_windows_wheels]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
