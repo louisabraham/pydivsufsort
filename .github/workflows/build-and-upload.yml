@@ -88,16 +88,22 @@ jobs:
         shell: bash
   build_windows_wheels:
     needs: testing
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
-          - arch: win32
-            skip: "*-win_amd64"
+          - os: windows-latest
+            arch: win32
+            skip: "*-win_amd64 *-win_arm64"
             platform: "-A win32"
-          - arch: amd64
-            skip: "*-win32"
+          - os: windows-latest
+            arch: amd64
+            skip: "*-win32 *-win_arm64"
             platform: "-A x64"
+          - os: windows-11-arm
+            arch: arm64
+            skip: "*-win32 *-win_amd64"
+            platform: ""
     steps:
       - name: Checkout Repository And Submodules
         uses: actions/checkout@v3
