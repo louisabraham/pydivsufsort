@@ -88,10 +88,10 @@ jobs:
       matrix:
         include:
           - arch: win32
-            skip: "pp* *-win_amd64"
+            skip: "*-win_amd64"
             platform: "-A win32"
           - arch: amd64
-            skip: "pp* *-win32"
+            skip: "*-win32"
             platform: "-A x64"
     steps:
       - name: Checkout Repository And Submodules
