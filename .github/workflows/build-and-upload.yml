@@ -59,6 +59,7 @@ jobs:
         shell: bash
         env:
           PLATFORM_OPTION: ${{ runner.os == 'macOS' && format('-DCMAKE_OSX_ARCHITECTURES={0}', matrix.archs) || '' }}
+          MACOSX_DEPLOYMENT_TARGET: ${{ runner.os == 'macOS' && '11.0' || '' }}
       - name: Install Cibuildwheel
         run: python -m pip install cibuildwheel
         shell: bash
@@ -71,6 +72,7 @@ jobs:
           CIBW_ARCHS: ${{ matrix.archs }}
           CIBW_BUILD: ${{ matrix.build }}
           CIBW_ENVIRONMENT: SKIP_LIBDIVSUFSORT_BUILD=1
+          CIBW_ENVIRONMENT_MACOS: SKIP_LIBDIVSUFSORT_BUILD=1 MACOSX_DEPLOYMENT_TARGET=11.0
         run: |
           python -m cibuildwheel --output-dir wheelhouse
           ls wheelhouse/*
@@ -102,7 +104,7 @@ jobs:
             platform: "-A x64"
           - os: windows-11-arm
             arch: arm64
-            skip: "*-win32 *-win_amd64"
+            skip: "*-win32 *-win_amd64 cp39-* cp310-*"
             platform: ""
     steps:
       - name: Checkout Repository And Submodules
