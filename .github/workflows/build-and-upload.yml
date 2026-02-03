@@ -28,9 +28,14 @@ jobs:
             archs: aarch64
             build: "*"
             build_sdist: false
-          # macOS (cross-compilation)
+          # macOS native x86_64 (Intel)
+          - os: macos-15-intel
+            archs: x86_64
+            build: "*"
+            build_sdist: false
+          # macOS native arm64 (Apple Silicon)
           - os: macos-latest
-            archs: x86_64 arm64
+            archs: arm64
             build: "*"
             build_sdist: false
     steps:
