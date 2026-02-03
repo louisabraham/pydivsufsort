@@ -5,6 +5,10 @@ on:
     paths:
       - "setup.py"
       - .github/workflows/build-and-upload.yml
+
+permissions:
+  contents: write
+
 jobs:
   testing:
     uses: ./.github/workflows/test.yml
@@ -140,4 +144,31 @@ jobs:
         run: |
           python -m pip install twine
           python -m twine upload --skip-existing wheelhouse/*.whl
+        shell: bash
+  create_tag:
+    needs: [build_linux_macos_wheels, build_win32_wheels, build_amd64_wheels]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Extract Version from setup.py
+        id: get_version
+        run: |
+          VERSION=$(grep -Po 'version\s*=\s*"\K[0-9]+\.[0-9]+\.[0-9]+' setup.py || true)
+          if [ -z "$VERSION" ]; then
+            echo "ERROR: version not found in setup.py"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        shell: bash
+      - name: Create and Push Tag
+        run: |
+          TAG="v${{ steps.get_version.outputs.VERSION }}"
+          git rev-parse "refs/tags/$TAG" >/dev/null 2>&1 && exit 0
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag "$TAG"
+          git push origin "$TAG"
         shell: bash
