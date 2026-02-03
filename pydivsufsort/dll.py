@@ -1,6 +1,7 @@
-from pathlib import Path
+# pragma: no cover
 import ctypes
 import platform
+from pathlib import Path
 
 PATH = Path(__file__).parent
 

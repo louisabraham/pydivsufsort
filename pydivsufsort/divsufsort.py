@@ -3,8 +3,8 @@ Interface to the functions of libdivsufsort
 """
 
 import ctypes
-from array import array
 import warnings
+from array import array
 
 import numpy as np
 
@@ -111,7 +111,7 @@ def divsufsort(inp, force64=False):
         retval = libdivsufsort64.divsufsort64(inp_p, out_p, ctypes.c_int64(n))
 
     if retval:
-        raise Exception("libdivsufsort error", retval)
+        raise Exception("libdivsufsort error", retval)  # pragma: no cover
 
     return np.ctypeslib.as_array(out)
 
@@ -162,7 +162,7 @@ def bw_transform(inp, sa=None, force64=False):
         )
 
     if retval:
-        raise Exception("libdivsufsort error", retval)
+        raise Exception("libdivsufsort error", retval)  # pragma: no cover
 
     return idx.value, np.ctypeslib.as_array(out)
 
@@ -185,7 +185,7 @@ def inverse_bw_transform(idx, bwt, force64=False):
         )
 
     if retval:
-        raise Exception("libdivsufsort error", retval)
+        raise Exception("libdivsufsort error", retval)  # pragma: no cover
 
     return np.ctypeslib.as_array(out)
 
@@ -214,7 +214,7 @@ def sa_search(inp, sa, pattern):
         retval = libdivsufsort64.sa_search64(inp_p, n, pat_p, m, sa_p, n, left_p)
 
     if retval < 0:
-        raise Exception("libdivsufsort error", retval)
+        raise Exception("libdivsufsort error", retval)  # pragma: no cover
 
     count = retval
 
