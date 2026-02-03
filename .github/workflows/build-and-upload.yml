@@ -59,7 +59,6 @@ jobs:
         shell: bash
       - name: Build Wheels
         env:
-          CIBW_BEFORE_BUILD: pip install -U pip
           CIBW_SKIP: pp* *-musllinux_* *-manylinux_i686
           CIBW_BUILD_VERBOSITY: 1
           CIBW_TEST_REQUIRES: pytest
@@ -107,7 +106,6 @@ jobs:
         shell: bash
       - name: Build Wheels
         env:
-          CIBW_BEFORE_BUILD: bash ./build.sh
           CIBW_SKIP: ${{ matrix.skip }}
           CIBW_ENVIRONMENT: PLATFORM_OPTION='${{ matrix.platform }}'
           CIBW_BUILD_VERBOSITY: 1
