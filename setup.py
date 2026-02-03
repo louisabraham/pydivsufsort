@@ -38,6 +38,10 @@ except ImportError:
 
 class CustomBuildPy(build_py):
     def run(self):
+        if os.environ.get("SKIP_LIBDIVSUFSORT_BUILD"):
+            print("Skipping libdivsufsort build (SKIP_LIBDIVSUFSORT_BUILD is set)")
+            super().run()
+            return
         if platform.system() == "Windows":
             script = Path(__file__).parent / "build.sh"
             path = script.absolute().as_posix()

@@ -54,6 +54,11 @@ jobs:
         if: matrix.build_sdist
         run: python -m build --sdist
         shell: bash
+      - name: Build libdivsufsort
+        run: ./build.sh
+        shell: bash
+        env:
+          PLATFORM_OPTION: ${{ runner.os == 'macOS' && format('-DCMAKE_OSX_ARCHITECTURES={0}', matrix.archs) || '' }}
       - name: Install Cibuildwheel
         run: python -m pip install cibuildwheel
         shell: bash
@@ -65,6 +70,7 @@ jobs:
           CIBW_TEST_COMMAND: "pytest {project}/tests"
           CIBW_ARCHS: ${{ matrix.archs }}
           CIBW_BUILD: ${{ matrix.build }}
+          CIBW_ENVIRONMENT: SKIP_LIBDIVSUFSORT_BUILD=1
         run: |
           python -m cibuildwheel --output-dir wheelhouse
           ls wheelhouse/*
@@ -101,13 +107,18 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
+      - name: Build libdivsufsort
+        run: ./build.sh
+        shell: bash
+        env:
+          PLATFORM_OPTION: ${{ matrix.platform }}
       - name: Install Cibuildwheel
         run: python -m pip install cibuildwheel
         shell: bash
       - name: Build Wheels
         env:
           CIBW_SKIP: ${{ matrix.skip }}
-          CIBW_ENVIRONMENT: PLATFORM_OPTION='${{ matrix.platform }}'
+          CIBW_ENVIRONMENT: SKIP_LIBDIVSUFSORT_BUILD=1
           CIBW_BUILD_VERBOSITY: 1
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: "pytest {project}/tests"
