@@ -170,6 +170,45 @@ def test_sa_search():
                 assert (count, left) == sa_search(inp, sa, query)
 
 
+def test_sa_search_dtypes():
+    for n in [0, 1, 50]:
+        inp = np.random.randint(3, size=n).astype(np.uint8)
+        for dtype in _SUPPORTED_DTYPES:
+            s = inp.astype(dtype)
+            sa = divsufsort(inp)
+            for m in list(range(4)) * 5:
+                query = np.random.randint(3, size=m).astype(np.uint8)
+                matches = [
+                    i for i in range(n - m + 1) if (query == inp[i : i + m]).all()
+                ]
+                expected = sa_search(inp, sa, query)
+                if m == 0:
+                    # every suffix begins with the empty pattern
+                    assert expected == (n, 0 if n else None)
+                else:
+                    assert expected[0] == len(matches)
+                assert sa_search(s, sa, query) == expected
+                assert sa_search(s, sa, query.astype(dtype)) == expected
+                assert sa_search(s, sa, query.astype(np.int64)) == expected
+                assert sa_search(s, sa, list(query)) == expected
+
+    # the values of the pattern are compared, not its bytes
+    s = b"banana"
+    sa = divsufsort(s)
+    assert sa_search(s, sa, np.array([97, 110])) == (2, 1)
+    assert sa_search(s, sa, np.array([97, 1000])) == (0, None)
+    assert sa_search(s, sa, np.array([-159, 110])) == (0, None)
+    s = np.array([1000, 0, 1000, 0], dtype=np.uint16)
+    assert sa_search(s, divsufsort(s), "a") == (0, None)
+    assert sa_search(s, divsufsort(s), [1000, 0]) == (2, 2)
+    assert sa_search(s, divsufsort(s).astype(np.int64), [1000, 0]) == (2, 2)
+
+    with pytest.raises(ValueError):
+        sa_search(s, np.array([0, 1, 2, 4], dtype=np.int32), [1000])
+    with pytest.raises(ValueError):
+        sa_search(s, np.array([0, 1, 2], dtype=np.int32), [1000])
+
+
 def test_levenshtein():
     assert levenshtein("kitten", "sitting") == 3
 

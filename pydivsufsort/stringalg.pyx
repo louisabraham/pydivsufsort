@@ -643,3 +643,67 @@ def _inverse_bw_transform(
         j = order[p - 1]
         out[i] = bwt[j]
         p = j + (j >= idx)
+
+
+cdef inline int _compare_prefix(
+        string_t[::1] s, Py_ssize_t start, string_t[::1] pattern
+    ):
+    """Compare s[start:start + len(pattern)] with pattern: -1, 0 or 1.
+
+    0 means that the suffix at start begins with pattern.
+    A suffix that ends before the end of the pattern is smaller.
+    """
+    cdef Py_ssize_t n = s.shape[0], m = pattern.shape[0], k
+    for k in range(m):
+        if start + k == n:
+            return -1
+        if s[start + k] < pattern[k]:
+            return -1
+        if s[start + k] > pattern[k]:
+            return 1
+    return 0
+
+
+def _sa_search(
+        string_t[::1] s not None,
+        sa_t[::1] sa not None,
+        string_t[::1] pattern not None,
+    ):
+    """Search pattern in s with its suffix array, for any integer type.
+
+    Returns (count, left): the suffixes that begin with pattern are
+    sa[left:left + count]. Same result as sa_search in libdivsufsort.
+    """
+    cdef Py_ssize_t n = s.shape[0]
+    cdef Py_ssize_t lo = 0, hi = n, mid, left
+    cdef sa_t p
+
+    if sa.shape[0] != n:
+        raise ValueError("the input and the suffix array must have the same length")
+
+    # The suffixes that begin with pattern are consecutive in sa.
+    # First binary search: the first suffix that is not smaller than pattern.
+    while lo < hi:
+        mid = lo + (hi - lo) // 2
+        p = sa[mid]
+        if not 0 <= p < n:
+            raise ValueError("invalid suffix array")
+        if _compare_prefix(s, p, pattern) < 0:
+            lo = mid + 1
+        else:
+            hi = mid
+    left = lo
+
+    # Second binary search: the first suffix after left that does not begin
+    # with pattern.
+    hi = n
+    while lo < hi:
+        mid = lo + (hi - lo) // 2
+        p = sa[mid]
+        if not 0 <= p < n:
+            raise ValueError("invalid suffix array")
+        if _compare_prefix(s, p, pattern) <= 0:
+            lo = mid + 1
+        else:
+            hi = mid
+    return lo - left, left

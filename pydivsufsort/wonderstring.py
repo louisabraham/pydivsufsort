@@ -29,56 +29,29 @@ def cast_to_numpy(inp, copy=True):
 
 
 class WonderString:
+    """String with lazily computed suffix array, LCP array and LCP segment tree.
+
+    Each structure is computed the first time a method needs it, then kept.
+    Supports str (ASCII only), bytes and numpy arrays of all integer dtypes.
+    """
+
     def __init__(self, inp, copy=True):
         self.string = cast_to_numpy(inp, copy)
-        self.itemsize = self.string.dtype.itemsize
-
-    @property
-    def bytes(self):
-        if not hasattr(self, "_bytes"):
-            if self.string.dtype == np.uint8:
-                self._bytes = self.string
-            else:
-                self._bytes = self.string.view("uint8")
-        return self._bytes
-
-    @property
-    def suffix_array_bytes(self):
-        if not hasattr(self, "_suffix_array_bytes"):
-            self._suffix_array_bytes = divsufsort(self.bytes)
-        return self._suffix_array_bytes
 
     @property
     def suffix_array(self):
         if not hasattr(self, "_suffix_array"):
-            if self.itemsize == 1:
-                self._suffix_array = self.suffix_array_bytes
-            else:
-                self._suffix_array = np.ascontiguousarray(
-                    self.suffix_array_bytes[
-                        self.suffix_array_bytes % self.itemsize == 0
-                    ]
-                    // self.itemsize
-                )
+            self._suffix_array = divsufsort(self.string)
         return self._suffix_array
 
     def search(self, pattern, return_positions=False):
-        if self.itemsize != 1:
-            if not return_positions:
-                raise NotImplementedError(
-                    "For non-byte strings, we only support return_positions=True."
-                )
+        """Search for a pattern.
 
-            pattern = cast_to_numpy(pattern)
-            assert (
-                pattern.dtype == self.string.dtype
-            ), "pattern must have the same dtype as the string"
-            pattern = pattern.view("uint8")
-            count, position = sa_search(self.bytes, self.suffix_array_bytes, pattern)
-            positions = self.suffix_array_bytes[position : position + count]
-            positions = positions[positions % self.itemsize == 0] // self.itemsize
-            return positions
-
+        Returns (count, position): the number of occurrences, and the index of
+        the first one in the suffix array (None if there is no occurrence).
+        With return_positions=True, returns the positions of the occurrences
+        in the string, in suffix array order.
+        """
         ans = SearchResult(*sa_search(self.string, self.suffix_array, pattern))
 
         if return_positions:

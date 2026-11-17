@@ -275,14 +275,78 @@ def inverse_bw_transform(idx, bwt, force64=False):
     return np.ctypeslib.as_array(out)
 
 
+def _pattern_as(pattern, dtype):
+    """Converts pattern to a contiguous array of dtype, without changing its values.
+
+    Returns None if a value of pattern does not fit in dtype:
+    then pattern cannot occur in an array of dtype.
+    """
+    if isinstance(pattern, str):
+        try:
+            pattern = pattern.encode("ascii")
+        except UnicodeEncodeError:
+            raise TypeError("str must only contain ascii chars")
+    if isinstance(pattern, (bytes, bytearray)):
+        pattern = np.frombuffer(pattern, dtype=np.uint8)
+    pattern = np.asarray(pattern)
+    if len(pattern) == 0:
+        return np.empty(0, dtype=dtype)
+    if pattern.dtype not in _SUPPORTED_DTYPES:
+        raise TypeError(pattern.dtype)
+    info = np.iinfo(dtype)
+    # int() avoids comparisons between int64 and uint64 in numpy
+    if int(pattern.min()) < info.min or int(pattern.max()) > info.max:
+        return None
+    return np.ascontiguousarray(pattern, dtype=dtype)
+
+
 def sa_search(inp, sa, pattern):
+    """Search for a pattern with a suffix array.
+
+    Parameters
+    ----------
+    inp : str (ASCII only), bytes-like object, or numpy array of integers
+        All integer dtypes are supported (int8 to uint64).
+    sa : numpy array of int32 or int64
+        Suffix array of inp.
+    pattern : str (ASCII only), bytes-like object, list or numpy array of integers
+        The values of pattern are compared with the values of inp,
+        even if the dtypes are different.
+
+    Returns
+    -------
+    count : int
+        Number of occurrences of pattern in inp.
+    left : int or None
+        The occurrences start at the positions sa[left:left + count].
+        None if count is 0.
+
+    Examples
+    --------
+    >>> s = np.array([1000, 0, 1000, 0], dtype=np.uint16)
+    >>> sa_search(s, divsufsort(s), [1000, 0])
+    (2, 2)
+    """
+    if _is_wide_array(inp):
+        # stringalg imports this module, thus we cannot import it at the top
+        from .stringalg import _sa_search
+
+        pattern = _pattern_as(pattern, inp.dtype)
+        if pattern is None:
+            return 0, None
+        inp = np.ascontiguousarray(inp)
+        count, left = _sa_search(inp, np.ascontiguousarray(sa), pattern)
+        return count, left if count else None
+
     n = len(inp)
     m = len(pattern)
 
     inp_p = _get_bytes_pointer(inp)
     sa_p = ctypes.pointer(np.ctypeslib.as_ctypes(sa))
-    if isinstance(pattern, np.ndarray):
-        pattern = _cast(pattern)
+    if isinstance(pattern, (np.ndarray, list, tuple)):
+        pattern = _pattern_as(pattern, np.uint8)
+        if pattern is None:
+            return 0, None
     pat_p = _get_bytes_pointer(pattern)
 
     if sa.dtype == np.int32:
