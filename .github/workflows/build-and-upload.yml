@@ -5,6 +5,7 @@ on:
     paths:
       - "setup.py"
       - .github/workflows/build-and-upload.yml
+  workflow_dispatch: {}
 
 permissions:
   contents: write
