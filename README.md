@@ -27,7 +27,7 @@ We provide precompiled wheels for common systems using `cibuildwheel`, and a sou
 
 All methods support string, bytes and numpy array inputs, including datatypes greater than `uint8_t` (e.g. `uint64_t`). Below are the signatures of all methods exposed by `pydivsufsort`. To import a method, just do `from pydivsufsort import method_name`. All methods are documented in the docstrings. You can display them with `help(method_name)`.
 
-A nicer interface to reuse computations lazily is provided in WonderString but currently undocumented. Please create an issue if you are interested.
+To run many queries on the same string, use the [`WonderString`](#wonderstring) class: it computes the suffix array and the LCP array only once.
 
 ### Methods exposed from libdivsufsort
 
@@ -35,7 +35,6 @@ A nicer interface to reuse computations lazily is provided in WonderString but c
 - `bw_transform(string, sa=None)`: Burrows-Wheeler transform (the output keeps the dtype of the input)
 - `inverse_bw_transform(idx, string)`: inverse Burrows-Wheeler transform
 - `sa_search(string, suffix_array, pattern)`: search for a pattern in a suffix array
-
 
 ### Additional string algorithms
 
@@ -73,6 +72,34 @@ print(int_suffix_array, int_lcp_array)
 # [6 5 3 1 0 4 2] [0 1 3 0 0 2 0]
 ```
 
+### WonderString
+
+`WonderString(string)` computes the suffix array and the LCP array the first time a method needs them, and keeps them for the next calls. To import it, do `from pydivsufsort import WonderString`.
+
+- `string`: the input, as a numpy array
+- `suffix_array`: suffix array
+- `lcp_array`: LCP array
+- `search(pattern, return_positions=False)`: number of occurrences of the pattern, and index of the first one in the suffix array (`None` if there is no occurrence). With `return_positions=True`, returns the positions of the occurrences in the string, in suffix array order.
+- `lcp(i, j)`: length of the longest common prefix of the suffixes that start at `i` and `j`. `lcp(queries)` takes a list of pairs and returns an array.
+- `most_frequent_substrings(length, limit=0, minimum_count=1)`: positions in the string and counts of the most frequent substrings. See the docstring of `most_frequent_substrings` for details.
+
+With integer types other than `uint8`, only `search(pattern, return_positions=True)` is supported for now.
+
+```python
+from pydivsufsort import WonderString
+
+s = WonderString("banana")
+print(s.suffix_array, s.lcp_array)
+# [5 3 1 0 4 2] [1 3 0 0 2 0]
+print(s.search("an"))
+# SearchResult(count=2, position=1)
+print(s.search("an", return_positions=True))
+# [3 1]
+print(s.lcp(1, 3))
+# 3
+print(s.most_frequent_substrings(2, limit=1))
+# MFSResult(positions=array([4], dtype=int32), counts=array([2], dtype=int32))
+```
 
 ## Development
 
