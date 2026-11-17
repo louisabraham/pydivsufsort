@@ -59,18 +59,20 @@ def assert_correct(inp, queries=None):
     lcp_naive = [longest_common_prefix(inp, i, j) for i, j in queries]
     assert (lcp_opt == lcp_naive).all(), (inp, lcp_naive, lcp_opt)
 
-    if not (isinstance(inp, np.ndarray) and inp.dtype != np.uint8):
-        bwt_opt = bw_transform(inp)
-        bwt_opt2 = bw_transform(inp, sa)
-        assert bwt_opt[0] == bwt_opt2[0]
-        assert (bwt_opt[1] == bwt_opt2[1]).all()
-        bwt_naive = BWT(inp)
-        assert bwt_opt[0] == bwt_naive[0]
-        assert (bwt_opt[1] == bwt_naive[1]).all()
-        tr_opt = inverse_bw_transform(*bwt_opt)
-        tr_naive = iBWT(*bwt_naive)
-        assert (tr_opt == cast_to_np_array(inp)).all(), inp
-        assert (tr_opt == tr_naive).all(), inp
+    bwt_opt = bw_transform(inp)
+    bwt_opt2 = bw_transform(inp, sa)
+    assert bwt_opt[0] == bwt_opt2[0]
+    assert (bwt_opt[1] == bwt_opt2[1]).all()
+    bwt_naive = BWT(inp, sa)
+    assert bwt_opt[0] == bwt_naive[0]
+    assert (bwt_opt[1] == bwt_naive[1]).all()
+    tr_opt = inverse_bw_transform(*bwt_opt)
+    tr_naive = iBWT(*bwt_naive)
+    assert (tr_opt == cast_to_np_array(inp)).all(), inp
+    assert (tr_opt == tr_naive).all(), inp
+    if isinstance(inp, np.ndarray):
+        assert bwt_opt[1].dtype == inp.dtype
+        assert tr_opt.dtype == inp.dtype
 
     if len(inp) < 100:
         assert min_rotation(inp) == min_rotation_ref(inp)
@@ -216,7 +218,10 @@ def test_warnings_errors():
         divsufsort(np.array([0.0]))
 
     with pytest.raises(TypeError):
-        bw_transform(np.array([0]))
+        bw_transform(np.array([0.0]))
+
+    with pytest.raises(TypeError):
+        inverse_bw_transform(1, np.array([0.0]))
 
 
 def test64():
@@ -231,6 +236,16 @@ def test64():
 
     res = sa_search(s, sa, "an")
     assert res == (2, 1)
+
+    # 64-bit suffix array with the 32-bit version of libdivsufsort
+    assert bw_transform(s, sa)[0] == bw_transform(s)[0]
+    assert (bw_transform(s, sa)[1] == bw_transform(s)[1]).all()
+
+    inp = np.array([1000, 0, 2000, 0], dtype=np.uint16)
+    bwt = bw_transform(inp, force64=True)
+    assert (bwt[1] == bw_transform(inp)[1]).all()
+    assert (bwt[1] == bw_transform(inp, divsufsort(inp).astype(np.int64))[1]).all()
+    assert (inverse_bw_transform(*bwt, force64=True) == inp).all()
 
 
 def test_lpf():
@@ -268,3 +283,57 @@ def test_kmp_censor_stream():
     assert "".join(out) == "bnbn"
 
     out = list(kmp_censor_stream("a", "bonne journée"))
+
+
+def test_bwt_wide_dtypes():
+    # same result as the uint8 version of libdivsufsort
+    for _ in range(20):
+        inp = randint_ascii(50) % 4
+        idx, bwt = bw_transform(inp)
+        for dtype in _SUPPORTED_DTYPES:
+            idx2, bwt2 = bw_transform(inp.astype(dtype))
+            assert idx2 == idx
+            assert (bwt2 == bwt).all()
+            assert (inverse_bw_transform(idx2, bwt2) == inp).all()
+
+    # values that do not fit in one byte
+    inp = np.array([-(2**63), 2**63 - 1, -1, 0, 2**63 - 1, -(2**63)], dtype=np.int64)
+    assert (inverse_bw_transform(*bw_transform(inp)) == inp).all()
+    inp = np.array([2**64 - 1, 0, 2**64 - 1, 2**32], dtype=np.uint64)
+    assert (inverse_bw_transform(*bw_transform(inp)) == inp).all()
+
+
+def test_bwt_edge_cases():
+    for dtype in _SUPPORTED_DTYPES:
+        for n in range(4):
+            for inp in [np.zeros(n, dtype=dtype), np.arange(n, dtype=dtype)]:
+                idx, bwt = bw_transform(inp)
+                assert idx == (n and BWT(inp)[0])
+                assert bwt.dtype == inp.dtype
+                tr = inverse_bw_transform(idx, bwt)
+                assert tr.dtype == inp.dtype
+                assert (tr == inp).all()
+
+
+def test_bwt_invalid():
+    for bwt in [b"ab", np.array([1, 2], dtype=np.uint16)]:
+        for idx in [-1, 0, 3]:
+            with pytest.raises(ValueError):
+                inverse_bw_transform(idx, bwt)
+    for bwt in [b"", np.array([], dtype=np.uint16)]:
+        with pytest.raises(ValueError):
+            inverse_bw_transform(1, bwt)
+
+    # rows 0 -> 2 -> 0 and 1 -> 1 form two cycles: not a valid transform
+    with pytest.raises(ValueError):
+        inverse_bw_transform(2, np.array([1, 0], dtype=np.uint16))
+
+    inp = np.array([1, 2, 3], dtype=np.uint16)
+    for sa in [
+        np.array([1, 2], dtype=np.int32),
+        np.array([1, 2, 3], dtype=np.int32),
+        np.array([0, 4, 1], dtype=np.int64),
+        np.array([0, -1, 1], dtype=np.int64),
+    ]:
+        with pytest.raises(ValueError):
+            bw_transform(inp, sa)

@@ -116,22 +116,73 @@ def divsufsort(inp, force64=False):
     return np.ctypeslib.as_array(out)
 
 
-DTYPE_NOT_SUPPORTED_MSG = (
-    "This function only supports inputs that can be converted to uint8.\n"
-    "Please raise an issue on <https://github.com/louisabraham/pydivsufsort/issues>"
-)
+def _is_wide_array(inp):
+    """True if inp is a numpy array that libdivsufsort cannot read directly"""
+    if not isinstance(inp, np.ndarray) or inp.dtype == np.uint8:
+        return False
+    if inp.dtype not in _SUPPORTED_DTYPES:
+        raise TypeError(inp.dtype)
+    return True
+
+
+def _bw_transform_wide(inp, sa, force64):
+    """bw_transform for integer types other than uint8, in Cython"""
+    # stringalg imports this module, thus we cannot import it at the top
+    from .stringalg import _bw_transform
+
+    inp = np.ascontiguousarray(inp)
+    out = np.empty_like(inp)
+    if len(inp) == 0:
+        return 0, out
+    if sa is None:
+        sa = divsufsort(inp, force64=force64)
+    idx = _bw_transform(inp, np.ascontiguousarray(sa), out)
+    return idx, out
+
+
+def _inverse_bw_transform_wide(idx, bwt):
+    """inverse_bw_transform for integer types other than uint8, in Cython"""
+    from .stringalg import _inverse_bw_transform
+
+    bwt = np.ascontiguousarray(bwt)
+    out = np.empty_like(bwt)
+    order = np.argsort(bwt, kind="stable")
+    _inverse_bw_transform(bwt, order, idx, out)
+    return out
 
 
 def bw_transform(inp, sa=None, force64=False):
+    """Burrows-Wheeler transform, in the format of libdivsufsort.
+
+    The input has an implicit end marker "$", smaller than all the values.
+    The transform is the last column of the sorted rotations of inp + "$",
+    without the "$". idx is the row of the "$" in that column.
+
+    Parameters
+    ----------
+    inp : str (ASCII only), bytes-like object, or numpy array of integers
+        All integer dtypes are supported (int8 to uint64).
+    sa : numpy array of int32 or int64, optional
+        Suffix array of inp. If None, it is calculated.
+    force64 : bool
+        Use the 64-bit version of libdivsufsort, also for small inputs.
+
+    Returns
+    -------
+    idx : int
+    bwt : numpy array
+        Same dtype as inp, or uint8 for str and bytes-like inputs.
+
+    Examples
+    --------
+    >>> bw_transform(b"banana")
+    (4, array([ 97, 110, 110,  98,  97,  97], dtype=uint8))
+    >>> bw_transform(np.array([1000, 0, 2000, 0], dtype=np.uint16))
+    (3, array([   0, 2000, 1000,    0], dtype=uint16))
+    """
     # TODO: inplace computation
-    if isinstance(inp, np.ndarray):
-        if inp.dtype == np.uint8:
-            pass
-        if inp.dtype in _SUPPORTED_DTYPES:
-            inp = _cast(inp)
-            dtype = inp.dtype
-            if dtype != np.uint8:
-                raise TypeError(DTYPE_NOT_SUPPORTED_MSG)
+    if _is_wide_array(inp):
+        return _bw_transform_wide(inp, sa, force64)
 
     if sa is None:
         sa_p = None
@@ -143,12 +194,12 @@ def bw_transform(inp, sa=None, force64=False):
 
     out = (ctypes.c_uint8 * n)()
     out_p = ctypes.byref(out)
-    if (
-        sa is not None
-        and sa.dtype == np.int32
-        or n <= np.iinfo(np.int32).max
-        and not force64
-    ):
+    # the 32-bit version needs a 32-bit suffix array
+    if sa is None:
+        use32 = n <= np.iinfo(np.int32).max and not force64
+    else:
+        use32 = sa.dtype == np.int32
+    if use32:
         idx = ctypes.c_int32()
         idx_p = ctypes.byref(idx)
         retval = libdivsufsort.bw_transform(
@@ -168,8 +219,42 @@ def bw_transform(inp, sa=None, force64=False):
 
 
 def inverse_bw_transform(idx, bwt, force64=False):
+    """Inverse of bw_transform.
+
+    Parameters
+    ----------
+    idx : int
+    bwt : str (ASCII only), bytes-like object, or numpy array of integers
+        idx and bwt are the output of bw_transform.
+        All integer dtypes are supported (int8 to uint64).
+    force64 : bool
+        Use the 64-bit version of libdivsufsort, also for small inputs.
+        Only used for str, bytes-like and uint8 inputs.
+
+    Returns
+    -------
+    numpy array
+        Same dtype as bwt, or uint8 for str and bytes-like inputs.
+
+    Raises
+    ------
+    ValueError
+        If idx is not in [1, len(bwt)] (or 0 when bwt is empty).
+        For dtypes other than uint8, also if (idx, bwt) is not the output
+        of bw_transform for any input.
+
+    Examples
+    --------
+    >>> inverse_bw_transform(3, np.array([0, 2000, 1000, 0], dtype=np.uint16))
+    array([1000,    0, 2000,    0], dtype=uint16)
+    """
     # TODO: inplace computation
     n = len(bwt)
+    if not (0 < idx <= n or idx == n == 0):
+        raise ValueError(f"idx must be in [1, {n}]")
+    if _is_wide_array(bwt):
+        return _inverse_bw_transform_wide(idx, bwt)
+
     bwt_p = _get_bytes_pointer(bwt)
 
     out = (ctypes.c_uint8 * n)()

@@ -565,3 +565,81 @@ def kmp_censor_stream(censor, stream):
         buffer.pop_front()
     if out:
         yield out.decode("utf-8")
+
+
+def _bw_transform(
+        string_t[::1] s not None,
+        sa_t[::1] sa not None,
+        string_t[::1] out not None,
+    ):
+    """Write the Burrows-Wheeler transform of s to out and return its index.
+
+    Same output format as bw_transform in libdivsufsort, for any integer type.
+    See pydivsufsort.bw_transform.
+
+    The checks on sa only prevent access out of the bounds of the arrays.
+    They do not make sure that sa is the suffix array of s.
+    """
+    cdef Py_ssize_t n = s.shape[0]
+    cdef Py_ssize_t i, j = 1, idx = 0
+    cdef sa_t p
+
+    if sa.shape[0] != n or out.shape[0] != n:
+        raise ValueError("the input and the suffix array must have the same length")
+    if n == 0:
+        return 0
+
+    # Row 0 of the sorted rotations of s + "$" is "$" + s. It ends with s[n - 1].
+    # Row i + 1 starts with the suffix sa[i] and ends with s[sa[i] - 1].
+    # The row of suffix 0 ends with "$": it is not in out, its row is idx.
+    out[0] = s[n - 1]
+    for i in range(n):
+        p = sa[i]
+        if p == 0:
+            idx = i + 1
+        elif 0 < p <= n and j < n:
+            out[j] = s[p - 1]
+            j += 1
+        else:
+            raise ValueError("invalid suffix array")
+    return idx
+
+
+def _inverse_bw_transform(
+        string_t[::1] bwt not None,
+        np.intp_t[::1] order not None,
+        Py_ssize_t idx,
+        string_t[::1] out not None,
+    ):
+    """Write the inverse Burrows-Wheeler transform of (idx, bwt) to out.
+
+    order must be a stable argsort of bwt. See pydivsufsort.inverse_bw_transform.
+    """
+    cdef Py_ssize_t n = bwt.shape[0]
+    cdef Py_ssize_t i, j, p
+
+    if order.shape[0] != n or out.shape[0] != n:
+        raise ValueError("bwt, order and out must have the same length")
+    if n == 0:
+        return
+    if not 0 < idx <= n:
+        raise ValueError("idx must be in [1, len(bwt)]")
+
+    # Rows 0 to n are the sorted rotations of T + "$", where T is the output.
+    # The last column L is bwt, with "$" inserted at row idx.
+    # Thus the entry bwt[j] is in row j if j < idx, else in row j + 1.
+    # The first column F is "$" (row 0), then the values of bwt in sorted order:
+    # F[r] = bwt[order[r - 1]] for r >= 1.
+    # The sort is stable, thus the k-th occurrence of a value in F and the k-th
+    # occurrence of the same value in L are the same position of T.
+    # Row idx ends with "$", thus it is T + "$" and starts with T[0].
+    # If row p starts with T[i] = bwt[j], the row that starts with T[i + 1]
+    # ends with T[i], thus it is the row of bwt[j] in L.
+    p = idx
+    for i in range(n):
+        if p == 0:
+            # We came back to the row of "$" before the end of T.
+            raise ValueError("invalid Burrows-Wheeler transform")
+        j = order[p - 1]
+        out[i] = bwt[j]
+        p = j + (j >= idx)

@@ -32,7 +32,7 @@ A nicer interface to reuse computations lazily is provided in WonderString but c
 ### Methods exposed from libdivsufsort
 
 - `divsufsort(string)`: suffix array
-- `bw_transform(string)`: Burrows-Wheeler transform
+- `bw_transform(string, sa=None)`: Burrows-Wheeler transform (the output keeps the dtype of the input)
 - `inverse_bw_transform(idx, string)`: inverse Burrows-Wheeler transform
 - `sa_search(string, suffix_array, pattern)`: search for a pattern in a suffix array
 
@@ -131,7 +131,7 @@ For best performance, use contiguous arrays. If you have a sliced array, pydivsu
 
 The precompiled libraries use OpenMP. You can disable it by setting the env variable `OMP_NUM_THREADS=1`, and it will yield the same performance as the version compiled without OpenMP
 
-The original `libdivsufsort` only supports char as the base type. `pydivsufsort` can handle arrays of any integer type (even signed), by encoding each element as multiple chars, which makes the computation slower. If your values use an integer type that is bigger than required, but they span over a small contiguous range, `pydivsufsort` will automatically change their type (see [#6](https://github.com/louisabraham/pydivsufsort/issues/6)).
+The original `libdivsufsort` only supports char as the base type. `pydivsufsort` can handle arrays of any integer type (even signed), by encoding each element as multiple chars, which makes the computation slower. For integer types other than `uint8`, the Burrows-Wheeler transform and its inverse are implemented in Cython: the transform reads the suffix array, and the inverse uses a stable sort of the transform. If your values use an integer type that is bigger than required, but they span over a small contiguous range, `pydivsufsort` will automatically change their type (see [#6](https://github.com/louisabraham/pydivsufsort/issues/6)).
 
 ## Acknowledgements
 
