@@ -671,15 +671,13 @@ def _sa_search(
     ):
     """Search pattern in s with its suffix array, for any integer type.
 
+    sa can also be a sorted subset of the suffix array (sparse suffix array).
     Returns (count, left): the suffixes that begin with pattern are
     sa[left:left + count]. Same result as sa_search in libdivsufsort.
     """
-    cdef Py_ssize_t n = s.shape[0]
-    cdef Py_ssize_t lo = 0, hi = n, mid, left
+    cdef Py_ssize_t n = s.shape[0], n_sa = sa.shape[0]
+    cdef Py_ssize_t lo = 0, hi = n_sa, mid, left
     cdef sa_t p
-
-    if sa.shape[0] != n:
-        raise ValueError("the input and the suffix array must have the same length")
 
     # The suffixes that begin with pattern are consecutive in sa.
     # First binary search: the first suffix that is not smaller than pattern.
@@ -696,7 +694,7 @@ def _sa_search(
 
     # Second binary search: the first suffix after left that does not begin
     # with pattern.
-    hi = n
+    hi = n_sa
     while lo < hi:
         mid = lo + (hi - lo) // 2
         p = sa[mid]

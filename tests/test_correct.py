@@ -205,8 +205,36 @@ def test_sa_search_dtypes():
 
     with pytest.raises(ValueError):
         sa_search(s, np.array([0, 1, 2, 4], dtype=np.int32), [1000])
-    with pytest.raises(ValueError):
-        sa_search(s, np.array([0, 1, 2], dtype=np.int32), [1000])
+    for s in [b"banana", np.array([1000, 0, 1000, 0], dtype=np.uint16)]:
+        sa = divsufsort(s)
+        with pytest.raises(ValueError):
+            sa_search(s, np.concatenate([sa, sa]), s[:1])
+        with pytest.raises(TypeError):
+            sa_search(s, sa.astype(np.uint32), s[:1])
+
+
+def test_sa_search_sparse():
+    """Sorted subsets of the suffix array (sparse suffix arrays)"""
+    n = 60
+    inp = np.random.randint(3, size=n).astype(np.uint8)
+    sa = divsufsort(inp)
+    subsets = [sa[sa % 2 == 0], sa[sa % 7 == 3], sa[:5], sa[-3:], sa[:0]]
+    for dtype in _SUPPORTED_DTYPES:
+        s = inp.astype(dtype)
+        for sparse in subsets:
+            for sa_dtype in [np.int32, np.int64]:
+                sparse = sparse.astype(sa_dtype)
+                for m in [1, 2, 3] * 5:
+                    query = np.random.randint(3, size=m).astype(np.uint8)
+                    matches = {
+                        i for i in sparse if np.array_equal(inp[i : i + m], query)
+                    }
+                    count, left = sa_search(s, sparse, query)
+                    assert count == len(matches)
+                    if count:
+                        assert set(sparse[left : left + count]) == matches
+                    else:
+                        assert left is None
 
 
 def test_levenshtein():

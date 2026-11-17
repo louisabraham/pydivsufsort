@@ -308,7 +308,7 @@ def sa_search(inp, sa, pattern):
     inp : str (ASCII only), bytes-like object, or numpy array of integers
         All integer dtypes are supported (int8 to uint64).
     sa : numpy array of int32 or int64
-        Suffix array of inp.
+        Suffix array of inp, or a sorted subset of it (sparse suffix array).
     pattern : str (ASCII only), bytes-like object, list or numpy array of integers
         The values of pattern are compared with the values of inp,
         even if the dtypes are different.
@@ -327,6 +327,14 @@ def sa_search(inp, sa, pattern):
     >>> sa_search(s, divsufsort(s), [1000, 0])
     (2, 2)
     """
+    sa = np.ascontiguousarray(sa)
+    if sa.dtype not in (np.int32, np.int64):
+        raise TypeError(f"the suffix array must be int32 or int64, not {sa.dtype}")
+    n = len(inp)
+    n_sa = len(sa)
+    if n_sa > n:
+        raise ValueError("the suffix array is longer than the input")
+
     if _is_wide_array(inp):
         # stringalg imports this module, thus we cannot import it at the top
         from .stringalg import _sa_search
@@ -335,32 +343,44 @@ def sa_search(inp, sa, pattern):
         if pattern is None:
             return 0, None
         inp = np.ascontiguousarray(inp)
-        count, left = _sa_search(inp, np.ascontiguousarray(sa), pattern)
+        count, left = _sa_search(inp, sa, pattern)
         return count, left if count else None
 
-    n = len(inp)
     m = len(pattern)
-
-    inp_p = _get_bytes_pointer(inp)
-    sa_p = ctypes.pointer(np.ctypeslib.as_ctypes(sa))
     if isinstance(pattern, (np.ndarray, list, tuple)):
         pattern = _pattern_as(pattern, np.uint8)
         if pattern is None:
             return 0, None
+    inp_p = _get_bytes_pointer(inp)
     pat_p = _get_bytes_pointer(pattern)
 
-    if sa.dtype == np.int32:
-        n = ctypes.c_int32(n)
-        m = ctypes.c_int32(m)
+    # libdivsufsort takes the lengths of the input and of the suffix array
+    # separately: the suffix array can be sparse.
+    if sa.dtype == np.int32 and n <= np.iinfo(np.int32).max:
+        sa_p = ctypes.pointer(np.ctypeslib.as_ctypes(sa))
         left = ctypes.c_int32()
-        left_p = ctypes.byref(left)
-        retval = libdivsufsort.sa_search(inp_p, n, pat_p, m, sa_p, n, left_p)
+        retval = libdivsufsort.sa_search(
+            inp_p,
+            ctypes.c_int32(n),
+            pat_p,
+            ctypes.c_int32(m),
+            sa_p,
+            ctypes.c_int32(n_sa),
+            ctypes.byref(left),
+        )
     else:
-        n = ctypes.c_int64(n)
-        m = ctypes.c_int64(m)
+        sa = sa.astype(np.int64, copy=False)
+        sa_p = ctypes.pointer(np.ctypeslib.as_ctypes(sa))
         left = ctypes.c_int64()
-        left_p = ctypes.byref(left)
-        retval = libdivsufsort64.sa_search64(inp_p, n, pat_p, m, sa_p, n, left_p)
+        retval = libdivsufsort64.sa_search64(
+            inp_p,
+            ctypes.c_int64(n),
+            pat_p,
+            ctypes.c_int64(m),
+            sa_p,
+            ctypes.c_int64(n_sa),
+            ctypes.byref(left),
+        )
 
     if retval < 0:
         raise Exception("libdivsufsort error", retval)  # pragma: no cover
