@@ -14,6 +14,13 @@ def test_base():
     assert np.array_equal(s.most_frequent_substrings(length=4, limit=1), ([4], [2]))
 
 
+def test_cache():
+    s = WonderString("abcdabcd")
+    assert s.suffix_array is s.suffix_array
+    assert s.lcp_array is s.lcp_array
+    assert s._lcp_segtree is s._lcp_segtree
+
+
 def test_exceptions():
     with pytest.raises(TypeError):
         WonderString("abcdabcdé")

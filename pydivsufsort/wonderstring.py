@@ -95,11 +95,9 @@ class WonderString:
 
     @property
     def _lcp_segtree(self):
-        if not hasattr(self, "__lcp_segtree"):
-            self.__lcp_segtree = lcp_segtree(
-                self.string, self.suffix_array, self.lcp_array
-            )
-        return self.__lcp_segtree
+        if not hasattr(self, "_segtree"):
+            self._segtree = lcp_segtree(self.string, self.suffix_array, self.lcp_array)
+        return self._segtree
 
     def lcp(self, *args):
         if len(args) == 1:
